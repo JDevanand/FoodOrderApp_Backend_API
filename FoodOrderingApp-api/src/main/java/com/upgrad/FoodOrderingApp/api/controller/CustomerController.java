@@ -28,6 +28,7 @@ public class CustomerController {
     private CustomerService customerService;
 
     //Signup user endpoint
+    @CrossOrigin
     @RequestMapping(path = "/customer/signup", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupCustomerResponse> signup(@RequestBody(required = false) final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException {
 
@@ -47,17 +48,30 @@ public class CustomerController {
         signupUserResponse.setId(createdUserEntity.getUuid());
         signupUserResponse.setStatus("CUSTOMER SUCCESSFULLY REGISTERED");
 
+        /*
+        List<String> header = new ArrayList<>();
+        header.add("access-token");
+        headers.setAccessControlExposeHeaders(header);
+        */
+        /*
+         * If you fail to add this, you won't be able to get the access-token in the header in
+         * frontend because of lack of access control. So, make sure add the above code just below
+         * when you add the access-token in the HTTP header, to give the header access-control and
+         * expose it in the frontend.
+         */
+
         return new ResponseEntity<SignupCustomerResponse>(signupUserResponse, HttpStatus.CREATED);
     }
 
     //Customer SIGN IN endpoint
+    @CrossOrigin
     @RequestMapping(path = "/customer/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<LoginResponse> login(@RequestHeader("authorization") final String authorization) throws AuthenticationFailedException {
 
         CustomerAuthEntity userAuthEntity = customerService.userSignIn(authorization);
 
         LoginResponse signinResponse = new LoginResponse();
-        signinResponse.setId(userAuthEntity.getUser().getUuid());
+        signinResponse.setId(userAuthEntity.getCustomer().getUuid());
         signinResponse.setMessage("SIGNED IN SUCCESSFULLY");
 
 
@@ -69,15 +83,17 @@ public class CustomerController {
     }
 
     //Customer sign out endpoint
+    @CrossOrigin
     @RequestMapping(path = "/customer/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<LogoutResponse> logout(@RequestHeader("authorization") final String accessToken) throws AuthorizationFailedException {
 
-        CustomerAuthEntity loggedUsersAuthToken = customerService.userSignOut(accessToken);
+        CustomerAuthEntity loggedUsersAuthToken = customerService.logout(accessToken);
 
         LogoutResponse signoutResponse = new LogoutResponse();
-        signoutResponse.setId(loggedUsersAuthToken.getUser().getUuid());
+        signoutResponse.setId(loggedUsersAuthToken.getCustomer().getUuid());
         signoutResponse.setMessage("LOGGED OUT SUCCESSFULLY");
 
         return  new ResponseEntity<>(signoutResponse,HttpStatus.OK);
     }
+
 }

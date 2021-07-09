@@ -1,6 +1,7 @@
 package com.upgrad.FoodOrderingApp.api.exception;
 
 import com.upgrad.FoodOrderingApp.api.model.ErrorResponse;
+import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.AuthenticationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
 import com.upgrad.FoodOrderingApp.service.exception.SignUpRestrictedException;
@@ -36,6 +37,14 @@ public class RestExceptionHandler {
 
         return new ResponseEntity<>(
                 new ErrorResponse().code(exe.getCode()).message((exe.getErrorMessage())), HttpStatus.FORBIDDEN
+        );
+    }
+
+    @ExceptionHandler(AddressNotFoundException.class)
+    public ResponseEntity<ErrorResponse> addressNotFoundException(AddressNotFoundException exe, WebRequest request){
+
+        return new ResponseEntity<>(
+                new ErrorResponse().code(exe.getCode()).message((exe.getErrorMessage())), HttpStatus.NOT_FOUND
         );
     }
 }

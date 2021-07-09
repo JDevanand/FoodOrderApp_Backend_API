@@ -55,7 +55,7 @@ public class CustomerService {
     }
 
     //User sign out after bearer authentication using access token
-    public CustomerAuthEntity userSignOut(final String accessToken) throws AuthorizationFailedException {
+    public CustomerAuthEntity logout(final String accessToken) throws AuthorizationFailedException {
 
         CustomerAuthEntity loggedUserAuthTokenEntity = customerAuthDao.getUserAuthToken(accessToken);
         if(loggedUserAuthTokenEntity ==null){

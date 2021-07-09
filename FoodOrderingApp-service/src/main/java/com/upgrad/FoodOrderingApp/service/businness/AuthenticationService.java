@@ -50,7 +50,7 @@ public class AuthenticationService {
         if(encryptedPassword.equals(userEntity.getPassword())){
             JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(encryptedPassword);
             CustomerAuthEntity userAuthToken = new CustomerAuthEntity();
-            userAuthToken.setUser(userEntity);
+            userAuthToken.setCustomer(userEntity);
             userAuthToken.setUuid((UUID.randomUUID().toString()));
 
             final ZonedDateTime now = ZonedDateTime.now();

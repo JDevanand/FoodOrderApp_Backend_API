@@ -9,6 +9,8 @@ import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
 
 @Entity
 @Table(name="customer")
@@ -58,6 +60,9 @@ public class CustomerEntity implements Serializable {
     @Column(name = "SALT")
     @Size(max = 200)
     private String salt;
+
+    @ManyToMany(fetch = FetchType.LAZY)
+    private List<AddressEntity> addressEntities = new ArrayList<>();
 
     public Integer getId() {
         return id;
@@ -121,6 +126,14 @@ public class CustomerEntity implements Serializable {
 
     public void setSalt(String salt) {
         this.salt = salt;
+    }
+
+    public List<AddressEntity> getAddressEntities() {
+        return addressEntities;
+    }
+
+    public void setAddressEntities(List<AddressEntity> addressEntities) {
+        this.addressEntities = addressEntities;
     }
 
     @Override

@@ -23,7 +23,6 @@ public class CustomerDao {
         return userEntity;
     }
 
-
     //Get user by contact number
     public CustomerEntity userByContactNumber(final String contactNumber) {
         try {
