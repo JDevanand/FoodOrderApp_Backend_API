@@ -4,21 +4,20 @@ import org.apache.commons.lang3.builder.EqualsBuilder;
 import org.apache.commons.lang3.builder.HashCodeBuilder;
 import org.apache.commons.lang3.builder.ToStringBuilder;
 import org.apache.commons.lang3.builder.ToStringStyle;
+import org.springframework.stereotype.Repository;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
-import java.util.UUID;
 
 @Entity
-@Table(name="state")
+@Table(name="payment")
 @NamedQueries(
         {
-                @NamedQuery(name = "stateByUuid", query = "select s from StateEntity s where s.uuid = :uuid"),
-                @NamedQuery(name = "getAllStates", query = "select s from StateEntity s")
+                @NamedQuery(name="getpaymentmode", query = "select p from PaymentEntity p")
         }
-        )
+)
 
-public class StateEntity {
+public class PaymentEntity {
 
     @Id
     @Column(name = "ID")
@@ -29,9 +28,9 @@ public class StateEntity {
     @Size(max=200)
     private String uuid;
 
-    @Column(name ="state_name")
-    @Size(max=30)
-    private String stateName;
+    @Column(name ="payment_name")
+    @Size(max=255)
+    private String paymentName;
 
     public Integer getId() {
         return id;
@@ -49,12 +48,12 @@ public class StateEntity {
         this.uuid = uuid;
     }
 
-    public String getStateName() {
-        return stateName;
+    public String getPaymentName() {
+        return paymentName;
     }
 
-    public void setStateName(String stateName) {
-        this.stateName = stateName;
+    public void setPaymentName(String paymentName) {
+        this.paymentName = paymentName;
     }
 
     @Override

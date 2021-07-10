@@ -1,5 +1,9 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
+import org.apache.commons.lang3.builder.EqualsBuilder;
+import org.apache.commons.lang3.builder.HashCodeBuilder;
+import org.apache.commons.lang3.builder.ToStringBuilder;
+import org.apache.commons.lang3.builder.ToStringStyle;
 import org.hibernate.annotations.OnDelete;
 import org.hibernate.annotations.OnDeleteAction;
 
@@ -12,7 +16,7 @@ import java.util.List;
 @NamedQueries(
         {
                 @NamedQuery(name="getAllAddresses", query = "select q from AddressEntity q"),
-                @NamedQuery(name="getAddressbyUuid", query = "select q from AddressEntity q where q.uuid =: uuid")
+                @NamedQuery(name="getAddressbyUuid", query = "select q from AddressEntity q where q.uuid =:uuid")
         }
 )
 
@@ -51,8 +55,11 @@ public class AddressEntity {
     @Column(name ="active")
     private int active;
 
+    /*
     @ManyToMany(fetch = FetchType.LAZY, mappedBy = "address")
     private List<CustomerEntity> customerEntities;
+    *
+     */
 
     public Integer getId() {
         return id;
@@ -119,11 +126,27 @@ public class AddressEntity {
         this.active = active;
     }
 
+    /*
     public List<CustomerEntity> getCustomerEntities() {
         return customerEntities;
     }
 
     public void setCustomerEntities(List<CustomerEntity> customerEntities) {
         this.customerEntities = customerEntities;
+    }
+*/
+    @Override
+    public boolean equals(Object obj) {
+        return new EqualsBuilder().append(this, obj).isEquals();
+    }
+
+    @Override
+    public int hashCode() {
+        return new HashCodeBuilder().append(this).hashCode();
+    }
+
+    @Override
+    public String toString() {
+        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
 }
