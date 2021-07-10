@@ -33,4 +33,15 @@ public class CustomerDao {
         }
     }
 
+    //update Customer
+    @Transactional(propagation = Propagation.REQUIRED)
+    public CustomerEntity updateCustomer(CustomerEntity customerEntity){
+        try{
+            entityManager.merge(customerEntity);
+            return customerEntity;
+        } catch (NoResultException nre){
+            return null;
+        }
+    }
+
 }
