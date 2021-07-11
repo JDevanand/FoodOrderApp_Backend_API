@@ -38,18 +38,42 @@ public class RestaurantEntity {
     private String photoUrl;
 
     @Column(name ="customer_rating")
-    private float customer_rating;
+    private double customerRating;
 
     @Column(name ="average_price_for_two")
-    private Integer averagePriceForTwo;
+    private Integer avgPrice;
 
     @Column(name ="number_of_customers_rated")
-    private Integer noOfCustomersRated;
+    private Integer numberCustomersRated;
 
-    @Column(name ="address_id")
-    private Integer addressId;
+    @OneToOne
+    @JoinColumn(name ="address_id")
+    private AddressEntity address;
 
-    /*
+    public double getCustomerRating() {
+        return customerRating;
+    }
+
+    public void setCustomerRating(double customerRating) {
+        this.customerRating = customerRating;
+    }
+
+    public Integer getAvgPrice() {
+        return avgPrice;
+    }
+
+    public void setAvgPrice(Integer avgPrice) {
+        this.avgPrice = avgPrice;
+    }
+
+    public Integer getNumberCustomersRated() {
+        return numberCustomersRated;
+    }
+
+    public void setNumberCustomersRated(Integer numberCustomersRated) {
+        this.numberCustomersRated = numberCustomersRated;
+    }
+/*
     @ManyToMany(fetch = FetchType.EAGER, cascade = {CascadeType.PERSIST, CascadeType.MERGE})
     @JoinTable(
             name="restaurant_category",
@@ -102,36 +126,13 @@ public class RestaurantEntity {
         this.photoUrl = photoUrl;
     }
 
-    public float getCustomer_rating() {
-        return customer_rating;
+
+    public AddressEntity getAddress() {
+        return address;
     }
 
-    public void setCustomer_rating(float customer_rating) {
-        this.customer_rating = customer_rating;
-    }
-
-    public Integer getAveragePriceForTwo() {
-        return averagePriceForTwo;
-    }
-
-    public void setAveragePriceForTwo(Integer averagePriceForTwo) {
-        this.averagePriceForTwo = averagePriceForTwo;
-    }
-
-    public Integer getNoOfCustomersRated() {
-        return noOfCustomersRated;
-    }
-
-    public void setNoOfCustomersRated(Integer noOfCustomersRated) {
-        this.noOfCustomersRated = noOfCustomersRated;
-    }
-
-    public Integer getAddressId() {
-        return addressId;
-    }
-
-    public void setAddressId(Integer addressId) {
-        this.addressId = addressId;
+    public void setAddress(AddressEntity address) {
+        this.address = address;
     }
 
     @Override

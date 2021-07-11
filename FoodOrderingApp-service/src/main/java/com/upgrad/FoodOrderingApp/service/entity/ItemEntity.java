@@ -7,7 +7,9 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name="item")
@@ -34,15 +36,15 @@ public class ItemEntity {
     private String type;
 
     //observe
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "itemEntities")
-    private List<CategoryEntity> categoryEntities;
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private Set<CategoryItemEntity> categoryItemEntities = new HashSet<>();
 
-    public List<CategoryEntity> getCategoryEntities() {
-        return categoryEntities;
+    public Set<CategoryItemEntity> getCategoryItemEntities() {
+        return categoryItemEntities;
     }
 
-    public void setCategoryEntities(List<CategoryEntity> categoryEntities) {
-        this.categoryEntities = categoryEntities;
+    public void setCategoryItemEntities(Set<CategoryItemEntity> categoryItemEntities) {
+        this.categoryItemEntities = categoryItemEntities;
     }
 
     public Integer getId() {
@@ -85,6 +87,7 @@ public class ItemEntity {
         this.type = type;
     }
 
+    /*
     @Override
     public boolean equals(Object obj) {
         return new EqualsBuilder().append(this, obj).isEquals();
@@ -99,5 +102,7 @@ public class ItemEntity {
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
+    */
+
 
 }

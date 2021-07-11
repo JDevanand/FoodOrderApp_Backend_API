@@ -1,18 +1,38 @@
 package com.upgrad.FoodOrderingApp.service.dao;
 
+import com.upgrad.FoodOrderingApp.service.entity.CategoryEntity;
 import com.upgrad.FoodOrderingApp.service.entity.RestaurantCategoryEntity;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.jpa.repository.JpaRepository;
+import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
 import org.springframework.stereotype.Repository;
 
-import javax.persistence.Entity;
 import javax.persistence.EntityManager;
-import javax.persistence.Id;
+import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
+import java.util.List;
 
-import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
-import com.upgrad.FoodOrderingApp.service.entity.CategoryEntity;
+@Repository
+public class RestaurantCategoryDao {
 
-public interface RestaurantCategoryDao extends JpaRepository<RestaurantCategoryEntity, Id> {
+    @PersistenceContext
+    private EntityManager entityManager;
+
+    public List<RestaurantCategoryEntity> getRestaurantandCategory(RestaurantEntity restaurantEntity){
+        try {
+            return entityManager.createNamedQuery("byRestaurant", RestaurantCategoryEntity.class).setParameter("restaurantEntity", restaurantEntity)
+                    .getResultList();
+        } catch (NoResultException nre){
+            return null;
+        }
+    }
+
+
+    public List<RestaurantCategoryEntity> getRCByCategory(CategoryEntity categoryEntity){
+        try {
+            return entityManager.createNamedQuery("byCategory", RestaurantCategoryEntity.class).setParameter("categoryEntity", categoryEntity)
+                    .getResultList();
+        } catch (NoResultException nre){
+            return null;
+        }
+    }
 
 }

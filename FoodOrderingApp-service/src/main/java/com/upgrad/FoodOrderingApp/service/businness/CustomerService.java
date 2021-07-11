@@ -13,6 +13,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.time.ZonedDateTime;
+import java.util.Arrays;
+import java.util.HashSet;
+import java.util.Set;
+import java.util.UUID;
+import java.util.regex.Pattern;
 
 @Service
 public class CustomerService {
@@ -26,9 +31,6 @@ public class CustomerService {
     @Autowired
     private PasswordCryptographyProvider cryptographyProvider;
 
-    @Autowired
-    private AuthenticationService authenticationService;
-
     //Create a new user
     //Throws exception if user name or email id is already registered.
     public CustomerEntity saveCustomer(CustomerEntity userEntity) throws SignUpRestrictedException {
@@ -37,22 +39,55 @@ public class CustomerService {
         userEntity.setSalt(encryptedText[0]);
         userEntity.setPassword(encryptedText[1]);
 
-        /*
-        //If the contact number provided by the user already exists in the current database,
-        // throw ‘SignUpRestrictedException’ with the
-        // message code -'SGR-001' and message -'This contact number is already registered! Try other contact number.'.
+        if(userEntity.getFirstName()==null || userEntity.getContactNumber()==null ||userEntity.getPassword()==null || userEntity.getEmail()==null){
+            throw new SignUpRestrictedException("SGR-005","Except lastname all fields should be filled");
+        }
+
+        if(!passwordChecker(userEntity.getPassword())){
+            throw new SignUpRestrictedException("SGR-004","Weak password!");
+        }
+
+        if(!contactNumberFormatChecker(userEntity.getContactNumber())){
+            throw new SignUpRestrictedException("SGR-003","Invalid contact number!");
+        }
+
         if(customerDao.userByContactNumber(userEntity.getContactNumber())!=null){
             throw new SignUpRestrictedException("SGR-001","This contact number is already registered! Try other contact number.");
         }
-        */
+        if(!isValidEmailFormat(userEntity.getEmail())){
+            throw new SignUpRestrictedException("SGR-002","Invalid email-id format!");
+        }
 
         return customerDao.createUser(userEntity);
     }
 
-    //User sign in after Basic authentication
-    public CustomerAuthEntity userSignIn(final String authorization) throws AuthenticationFailedException {
+    //Authenticate user
+    public CustomerAuthEntity authenticate(String username, String password) throws AuthenticationFailedException {
 
-        return authenticationService.authenticate(authorization);
+        CustomerEntity loggedCustomer = customerDao.userByContactNumber(username);
+        if(loggedCustomer ==null){
+            throw new AuthenticationFailedException("ATHR-001","This contact number has not been registered!");
+        }
+
+        final String encryptedPassword = cryptographyProvider.encrypt(password, loggedCustomer.getSalt());
+        if(encryptedPassword.equals(loggedCustomer.getPassword())){
+            JwtTokenProvider jwtTokenProvider = new JwtTokenProvider(encryptedPassword);
+            CustomerAuthEntity userAuthToken = new CustomerAuthEntity();
+            userAuthToken.setCustomer(loggedCustomer);
+            userAuthToken.setUuid((UUID.randomUUID().toString()));
+
+            final ZonedDateTime now = ZonedDateTime.now();
+            final ZonedDateTime expiresAt = now.plusHours(8);
+            userAuthToken.setAccessToken(jwtTokenProvider.generateToken(loggedCustomer.getUuid(), now, expiresAt));
+            userAuthToken.setLoginAt(now);
+            userAuthToken.setExpiresAt(expiresAt);
+
+            customerAuthDao.createAuthToken(userAuthToken);
+            return userAuthToken;
+        }else{
+            throw new AuthenticationFailedException("ATH-002","Invalid Credentials");
+        }
+
     }
 
     //User sign out after bearer authentication using access token
@@ -75,6 +110,29 @@ public class CustomerService {
             throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
 
+    }
+
+    //Get customer entity based on signed-in user
+    /******/
+    public CustomerEntity getCustomer(final String authorization) throws AuthorizationFailedException {
+
+        String[] splitString = authorization.split(" ");
+        String accessToken = splitString[1];
+
+        CustomerAuthEntity loggedUserAuthTokenEntity = customerAuthDao.getUserAuthToken(accessToken);
+        if(loggedUserAuthTokenEntity ==null){
+            throw new AuthorizationFailedException("ATHR-001","Customer is not Logged in.");
+        }
+
+        if(loggedUserAuthTokenEntity.getLogoutAt() !=null){
+            throw new AuthorizationFailedException("ATHR-002","Customer is logged out. Log in again to access this endpoint.");
+        }
+
+        if (loggedUserAuthTokenEntity.getExpiresAt().compareTo(ZonedDateTime.now()) < 0) {
+            throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
+        }
+
+        return new CustomerEntity();
     }
 
     //Customer name update
@@ -128,12 +186,83 @@ public class CustomerService {
             String loggedCustomerContact =  loggedUserAuthTokenEntity.getCustomer().getContactNumber();
             CustomerEntity loggedCustomerEntity = customerDao.userByContactNumber(loggedCustomerContact);
 
-            /***/
+            //Check password strength
+            if(!passwordChecker(loggedCustomerEntity.getPassword())){
+                throw new UpdateCustomerException("UCR-001)","Weak password!");
+            }
+
+            //Check old password matches
+            final String encryptedPassword = cryptographyProvider.encrypt(oldPassword, loggedCustomerEntity.getSalt());
+            if(!encryptedPassword.equals(loggedCustomerEntity.getPassword())){
+                throw new UpdateCustomerException("UCR-004","Incorrect old password!");
+            }
+
+            //update new password
+                String[] encryptedText = cryptographyProvider.encrypt(newPassword);
+                loggedCustomerEntity.setSalt(encryptedText[0]);
+                loggedCustomerEntity.setPassword(encryptedText[1]);
+
             return customerDao.updateCustomer(loggedCustomerEntity);
         } else {
             throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
 
     }
+
+    //Password Strength checker
+    public static boolean passwordChecker(String input)    {
+        // Checking lower alphabet in string
+        int n = input.length();
+        boolean hasUpper = false,
+                hasDigit = false, specialChar = false;
+
+        // & * ^
+        Set<Character> set = new HashSet<Character>(
+                Arrays.asList('!', '@', '#', '$', '%', '^', '&',
+                        '*'));
+        for (char i : input.toCharArray())
+        {
+            if (Character.isUpperCase(i))
+                hasUpper = true;
+            if (Character.isDigit(i))
+                hasDigit = true;
+            if (set.contains(i))
+                specialChar = true;
+        }
+
+        // Strength of password
+        if (hasDigit && hasUpper && specialChar && (n >= 8))
+            return true;
+        else
+            return false;
+    }
+
+    //contact number format checker
+    public static boolean contactNumberFormatChecker(String contactNumber){
+
+        try {
+            double d = Double.parseDouble(contactNumber);
+        } catch (NumberFormatException nfe) {
+            return false;
+        }
+
+        if(contactNumber.length()!=10){
+            return false;
+        }
+        return true;
+    }
+
+    //Email format checker
+    public static boolean isValidEmailFormat(String email)
+    {
+        String emailRegex = "^[a-zA-Z0-9_+&*-]+(?:\\."+
+                "[a-zA-Z0-9_+&*-]+)*@" +
+                "(?:[a-zA-Z0-9-]+\\.)+[a-z" +
+                "A-Z]{2,7}$";
+
+        Pattern pat = Pattern.compile(emailRegex);
+        return pat.matcher(email).matches();
+    }
+
 
 }

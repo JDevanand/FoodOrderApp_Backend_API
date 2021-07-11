@@ -8,7 +8,9 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name="category")
@@ -49,15 +51,15 @@ public class CategoryEntity {
 
      */
     //observe
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<ItemEntity> itemEntities = new ArrayList<>();
+    @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
+    private Set<CategoryItemEntity> categoryItemEntities = new HashSet<>();
 
-    public List<ItemEntity> getItemEntities() {
-        return itemEntities;
+    public Set<CategoryItemEntity> getCategoryItemEntities() {
+        return categoryItemEntities;
     }
 
-    public void setItemEntities(List<ItemEntity> itemEntities) {
-        this.itemEntities = itemEntities;
+    public void setCategoryItemEntities(Set<CategoryItemEntity> categoryItemEntities) {
+        this.categoryItemEntities = categoryItemEntities;
     }
 
     public Integer getId() {
@@ -84,6 +86,7 @@ public class CategoryEntity {
         this.categoryName = categoryName;
     }
 
+    /*
     @Override
     public boolean equals(Object obj) {
         return new EqualsBuilder().append(this, obj).isEquals();
@@ -98,4 +101,6 @@ public class CategoryEntity {
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
+    */
+
 }

@@ -2,6 +2,8 @@ package com.upgrad.FoodOrderingApp.service.dao;
 
 import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
 import org.springframework.stereotype.Repository;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
 import javax.persistence.NoResultException;
@@ -28,6 +30,13 @@ public class RestaurantDao {
         } catch (NoResultException nre){
             return  null;
         }
+    }
+
+    //Merge restaurant
+    @Transactional(propagation = Propagation.REQUIRED)
+    public RestaurantEntity updateRestaurant(RestaurantEntity updatedEntity){
+        entityManager.merge(updatedEntity);
+        return  updatedEntity;
     }
 
 }

@@ -10,6 +10,14 @@ import javax.persistence.*;
 
 @Entity
 @Table(name ="restaurant_category")
+@NamedQueries(
+        {
+                @NamedQuery(name = "byRestaurant", query = "select s from RestaurantCategoryEntity s where s.restaurantEntity = :restaurantEntity"),
+                @NamedQuery(name = "getAllRestaurantCategory", query = "select s from RestaurantCategoryEntity s"),
+                @NamedQuery(name = "byCategory", query = "select s from RestaurantCategoryEntity s where s.categoryEntity = :categoryEntity"),
+        }
+)
+
 public class RestaurantCategoryEntity {
 
     @Id
@@ -17,22 +25,13 @@ public class RestaurantCategoryEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Integer id;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "restaurant_id")
     private RestaurantEntity restaurantEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY, optional = false)
+    @ManyToOne(fetch = FetchType.EAGER, optional = false)
     @JoinColumn(name = "category_id")
     private CategoryEntity categoryEntity;
-
-    public RestaurantCategoryEntity(){
-
-    }
-
-    public RestaurantCategoryEntity(RestaurantEntity re, CategoryEntity ce){
-        this.restaurantEntity = re;
-        this.categoryEntity = ce;
-    }
 
     public Integer getId() {
         return id;
@@ -58,6 +57,7 @@ public class RestaurantCategoryEntity {
         this.categoryEntity = categoryEntity;
     }
 
+    /*
     @Override
     public boolean equals(Object obj) {
         return new EqualsBuilder().append(this, obj).isEquals();
@@ -72,6 +72,6 @@ public class RestaurantCategoryEntity {
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
-
+    */
 
 }

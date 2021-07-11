@@ -15,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Base64;
 import java.util.UUID;
 
 @RestController
@@ -46,18 +47,6 @@ public class CustomerController {
         signupUserResponse.setId(createdUserEntity.getUuid());
         signupUserResponse.setStatus("CUSTOMER SUCCESSFULLY REGISTERED");
 
-        /*
-        List<String> header = new ArrayList<>();
-        header.add("access-token");
-        headers.setAccessControlExposeHeaders(header);
-        */
-        /*
-         * If you fail to add this, you won't be able to get the access-token in the header in
-         * frontend because of lack of access control. So, make sure add the above code just below
-         * when you add the access-token in the HTTP header, to give the header access-control and
-         * expose it in the frontend.
-         */
-
         return new ResponseEntity<SignupCustomerResponse>(signupUserResponse, HttpStatus.CREATED);
     }
 
@@ -66,14 +55,30 @@ public class CustomerController {
     @RequestMapping(path = "/customer/login", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<LoginResponse> login(@RequestHeader("authorization") final String authorization) throws AuthenticationFailedException {
 
-        CustomerAuthEntity userAuthEntity = customerService.userSignIn(authorization);
+        String userName;
+        String password;
+        try {
+            byte[] decode = Base64.getDecoder().decode(authorization.split("Basic ")[1]);
+            String decodedText = new String(decode);
+            String[] decodedArray = decodedText.split(":");
+
+            userName = decodedArray[0]; //username is user contact_number
+            password = decodedArray[1];
+        } catch(Exception e){
+            throw new AuthenticationFailedException("ATH-003","Incorrect format of decoded customer name and password");
+        }
+
+        CustomerAuthEntity userAuthEntity = customerService.authenticate(userName,password);
 
         LoginResponse signinResponse = new LoginResponse();
         signinResponse.setId(userAuthEntity.getCustomer().getUuid());
         signinResponse.setMessage("SIGNED IN SUCCESSFULLY");
+        signinResponse.setContactNumber(userAuthEntity.getCustomer().getContactNumber());
+        signinResponse.setFirstName(userAuthEntity.getCustomer().getFirstName());
+        signinResponse.setLastName(userAuthEntity.getCustomer().getLastName());
+        signinResponse.setEmailAddress(userAuthEntity.getCustomer().getEmail());
 
-
-        //Access token to be sent in header which will be used in request from client
+        //Access token to be sent in header which will be used in request from frontend
         HttpHeaders headers = new HttpHeaders();
         headers.add("access-token",userAuthEntity.getAccessToken());
 
@@ -83,7 +88,11 @@ public class CustomerController {
     //Customer sign out endpoint
     @CrossOrigin
     @RequestMapping(path = "/customer/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<LogoutResponse> logout(@RequestHeader("authorization") final String accessToken) throws AuthorizationFailedException {
+    public ResponseEntity<LogoutResponse> logout(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
+
+        String accessToken = new String();
+        String[] splitString = authorization.split(" ");
+        accessToken = splitString[1];
 
         CustomerAuthEntity loggedUsersAuthToken = customerService.logout(accessToken);
 
@@ -97,12 +106,15 @@ public class CustomerController {
     //Update customer endpoint
     @CrossOrigin
     @RequestMapping(path="/customer",method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UpdateCustomerResponse> updateCustomer(@RequestHeader("authorization") final String accessToken, final UpdateCustomerRequest updateCustomerRequest) throws AuthorizationFailedException, UpdateCustomerException {
+    public ResponseEntity<UpdateCustomerResponse> updateCustomer(@RequestHeader("authorization") final String authorization, final UpdateCustomerRequest updateCustomerRequest) throws AuthorizationFailedException, UpdateCustomerException {
 
        CustomerEntity tobeUpdatedCustomer = new CustomerEntity();
         tobeUpdatedCustomer.setFirstName(updateCustomerRequest.getFirstName());
         tobeUpdatedCustomer.setLastName(updateCustomerRequest.getLastName());
 
+        String accessToken = new String();
+        String[] splitString = authorization.split(" ");
+        accessToken = splitString[1];
         CustomerEntity updatedCustomer = customerService.updateCustomer(accessToken,tobeUpdatedCustomer);
 
         UpdateCustomerResponse updatedCustomerResponse = new UpdateCustomerResponse();
@@ -117,8 +129,12 @@ public class CustomerController {
     //Update customer password
     @CrossOrigin
     @RequestMapping(path="/customer/password",method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UpdatePasswordResponse > updateCustomerPassword(@RequestHeader("authorization") final String accessToken, final UpdatePasswordRequest updatePasswordRequest) throws AuthorizationFailedException, UpdateCustomerException {
+    public ResponseEntity<UpdatePasswordResponse > updateCustomerPassword(@RequestHeader("authorization") final String authorization, final UpdatePasswordRequest updatePasswordRequest) throws AuthorizationFailedException, UpdateCustomerException {
 
+
+        String accessToken = new String();
+        String[] splitString = authorization.split(" ");
+        accessToken = splitString[1];
         CustomerEntity ce = customerService.updateCustomerPassword(accessToken,updatePasswordRequest.getOldPassword(),updatePasswordRequest.getNewPassword());
 
         UpdatePasswordResponse upr = new UpdatePasswordResponse();
