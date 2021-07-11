@@ -32,7 +32,17 @@ public class RestaurantDao {
         }
     }
 
-    //Merge restaurant
+    //Fetch restaurants containing a string
+    public List<RestaurantEntity> getRestaurantByName(final String pattern){
+        try{
+            return entityManager.createNamedQuery("bySearchString",RestaurantEntity.class).setParameter("pattern", pattern)
+                    .getResultList();
+        }catch (NoResultException nre){
+            return null;
+        }
+    }
+
+    //Merge updated restaurant details
     @Transactional(propagation = Propagation.REQUIRED)
     public RestaurantEntity updateRestaurant(RestaurantEntity updatedEntity){
         entityManager.merge(updatedEntity);

@@ -88,12 +88,13 @@ public class RestaurantController {
         return new ResponseEntity<>(restaurantListResponse, HttpStatus.OK);
     }
 
-    //Fetch restaurant by UUID
+    //Fetch restaurant by UUID along with items
     @CrossOrigin
     @RequestMapping(path = "/api/restaurant/{restaurant_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<RestaurantDetailsResponse> getRestaurantByUuid(@PathVariable("restaurant_id") final String restaurantUuid) throws RestaurantNotFoundException {
 
         RestaurantEntity fetchedRestaurant = restaurantService.restaurantByUUID(restaurantUuid);
+
 
         RestaurantDetailsResponse restaurantDetailsResponse = new RestaurantDetailsResponse();
 

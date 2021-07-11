@@ -102,8 +102,8 @@ public class RestaurantService {
         if(searchName == null){
             throw new RestaurantNotFoundException("RNF-003", "Restaurant name field should not be empty");
         }
-
-        List<RestaurantEntity> fetchedRestaurantList = new ArrayList<>();
+        String pattern = "%"+searchName+"%";
+        List<RestaurantEntity> fetchedRestaurantList = restaurantDao.getRestaurantByName(pattern);
 
         //Sort restaurant by name
         Collections.sort(fetchedRestaurantList,RestaurantService.NameComparator);
