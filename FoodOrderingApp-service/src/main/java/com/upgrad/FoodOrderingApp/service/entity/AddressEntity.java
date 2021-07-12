@@ -9,7 +9,9 @@ import org.hibernate.annotations.OnDeleteAction;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name="address")
@@ -55,11 +57,16 @@ public class AddressEntity {
     @Column(name ="active")
     private int active;
 
-    /*
-    @ManyToMany(fetch = FetchType.LAZY, mappedBy = "address")
-    private List<CustomerEntity> customerEntities;
-    *
-     */
+    @OneToMany(mappedBy = "address", cascade = CascadeType.ALL)
+    private Set<CustomerAddressEntity> customerAddressEntities = new HashSet<>();
+
+    public Set<CustomerAddressEntity> getCustomerAddressEntities() {
+        return customerAddressEntities;
+    }
+
+    public void setCustomerAddressEntities(Set<CustomerAddressEntity> customerAddressEntities) {
+        this.customerAddressEntities = customerAddressEntities;
+    }
 
     public Integer getId() {
         return id;

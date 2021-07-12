@@ -80,6 +80,20 @@ public class RestExceptionHandler {
         );
     }
 
+    @ExceptionHandler(PaymentMethodNotFoundException.class)
+    public ResponseEntity<ErrorResponse> paymentMethodNotFoundException(PaymentMethodNotFoundException exe, WebRequest webRequest){
+        return new ResponseEntity<>(
+                new ErrorResponse().code(exe.getCode()).message((exe.getErrorMessage())), HttpStatus.NOT_FOUND
+        );
+    }
+
+    @ExceptionHandler(ItemNotFoundException.class)
+    public ResponseEntity<ErrorResponse> itemNotFoundException(ItemNotFoundException exe, WebRequest webRequest){
+        return new ResponseEntity<>(
+                new ErrorResponse().code(exe.getCode()).message((exe.getErrorMessage())), HttpStatus.NOT_FOUND
+        );
+    }
+
     @ExceptionHandler(InvalidRatingException.class)
     public ResponseEntity<ErrorResponse> invalidRatingException(InvalidRatingException exe, WebRequest webRequest){
         return new ResponseEntity<>(

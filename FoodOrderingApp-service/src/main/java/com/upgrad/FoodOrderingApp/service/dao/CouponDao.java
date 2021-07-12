@@ -25,4 +25,14 @@ public class CouponDao {
         }
     }
 
+    //Get coupon by uuid
+    public CouponEntity getCouponByCouponId(final String couponUuid){
+        try {
+            return entityManager.createNamedQuery("byCouponId", CouponEntity.class).setParameter("uuid", couponUuid)
+                    .getSingleResult();
+        } catch (NoResultException nre) {
+            return null;
+        }
+    }
+
 }

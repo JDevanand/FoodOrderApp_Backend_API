@@ -35,22 +35,6 @@ public class CategoryEntity {
     @Size(max=255)
     private String categoryName;
 
-    /*
-    //observe
-    @ManyToMany(mappedBy = "categoryList")
-    private List<RestaurantEntity> restaurantList;
-
-    public List<RestaurantEntity> getRestaurantList() {
-        return restaurantList;
-    }
-
-    public void setRestaurantList(List<RestaurantEntity> restaurantList) {
-        this.restaurantList = restaurantList;
-    }
-    /
-
-     */
-    //observe
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private Set<CategoryItemEntity> categoryItemEntities = new HashSet<>();
 
@@ -60,6 +44,17 @@ public class CategoryEntity {
 
     public void setCategoryItemEntities(Set<CategoryItemEntity> categoryItemEntities) {
         this.categoryItemEntities = categoryItemEntities;
+    }
+
+    @OneToMany(mappedBy = "categoryEntity", cascade = CascadeType.ALL)
+    private Set<RestaurantCategoryEntity> restaurantCategoryEntities = new HashSet<>();
+
+    public Set<RestaurantCategoryEntity> getRestaurantCategoryEntities() {
+        return restaurantCategoryEntities;
+    }
+
+    public void setRestaurantCategoryEntities(Set<RestaurantCategoryEntity> restaurantCategoryEntities) {
+        this.restaurantCategoryEntities = restaurantCategoryEntities;
     }
 
     public Integer getId() {

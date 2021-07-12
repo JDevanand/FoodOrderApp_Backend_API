@@ -10,7 +10,9 @@ import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name="customer")
@@ -61,10 +63,17 @@ public class CustomerEntity implements Serializable {
     @Size(max = 200)
     private String salt;
 
-    /*
-    @ManyToMany(fetch = FetchType.LAZY)
-    private List<AddressEntity> addressEntities = new ArrayList<>();
-    */
+    @OneToMany(mappedBy = "address", cascade = CascadeType.ALL)
+    private Set<CustomerAddressEntity> customerAddressEntities = new HashSet<>();
+
+    public Set<CustomerAddressEntity> getCustomerAddressEntities() {
+        return customerAddressEntities;
+    }
+
+    public void setCustomerAddressEntities(Set<CustomerAddressEntity> customerAddressEntities) {
+        this.customerAddressEntities = customerAddressEntities;
+    }
+
     public Integer getId() {
         return id;
     }

@@ -56,7 +56,7 @@ public class AddressController {
         saveAddressResponse.setId(savedAddress.getUuid());
         saveAddressResponse.setStatus("ADDRESS SUCCESSFULLY REGISTERED");
 
-        return  new ResponseEntity<>(saveAddressResponse, HttpStatus.OK);
+        return  new ResponseEntity<>(saveAddressResponse, HttpStatus.CREATED);
     }
 
     //Get all saved address

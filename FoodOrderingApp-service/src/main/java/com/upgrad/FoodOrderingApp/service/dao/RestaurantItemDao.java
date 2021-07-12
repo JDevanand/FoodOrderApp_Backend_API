@@ -16,8 +16,8 @@ public class RestaurantItemDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<RestaurantItemEntity> getRestaurantItemsById(RestaurantEntity restaurant){
-        return entityManager.createNamedQuery("byRestaurantId",RestaurantItemEntity.class).setParameter("restaurant",restaurant)
+    public List<RestaurantItemEntity> getRestaurantItemsById(final String restaurantUuid){
+        return entityManager.createNamedQuery("byRestaurantId",RestaurantItemEntity.class).setParameter("restaurant",restaurantUuid)
                 .getResultList();
     }
 }

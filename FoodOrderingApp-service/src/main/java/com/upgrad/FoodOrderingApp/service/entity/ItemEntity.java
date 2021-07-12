@@ -13,6 +13,11 @@ import java.util.Set;
 
 @Entity
 @Table(name="item")
+@NamedQueries(
+        {
+                @NamedQuery(name="getItembyUuid", query = "select p from ItemEntity p where p.uuid =:uuid")
+        }
+)
 public class ItemEntity {
 
     @Id
@@ -35,7 +40,6 @@ public class ItemEntity {
     @Size(max=10)
     private String type;
 
-    //observe
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private Set<CategoryItemEntity> categoryItemEntities = new HashSet<>();
 
@@ -45,6 +49,28 @@ public class ItemEntity {
 
     public void setCategoryItemEntities(Set<CategoryItemEntity> categoryItemEntities) {
         this.categoryItemEntities = categoryItemEntities;
+    }
+
+    @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
+    private Set<OrderItemEntity> orderItemEntities = new HashSet<>();
+
+    public Set<OrderItemEntity> getOrderItemEntities() {
+        return orderItemEntities;
+    }
+
+    public void setOrderItemEntities(Set<OrderItemEntity> orderItemEntities) {
+        this.orderItemEntities = orderItemEntities;
+    }
+
+    @OneToMany(mappedBy = "itemEntity", cascade = CascadeType.ALL)
+    private Set<RestaurantItemEntity> restaurantItemEntities = new HashSet<>();
+
+    public Set<RestaurantItemEntity> getRestaurantItemEntities() {
+        return restaurantItemEntities;
+    }
+
+    public void setRestaurantItemEntities(Set<RestaurantItemEntity> restaurantItemEntities) {
+        this.restaurantItemEntities = restaurantItemEntities;
     }
 
     public Integer getId() {

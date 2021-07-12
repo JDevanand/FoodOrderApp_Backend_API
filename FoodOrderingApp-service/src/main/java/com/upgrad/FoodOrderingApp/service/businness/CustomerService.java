@@ -51,7 +51,7 @@ public class CustomerService {
             throw new SignUpRestrictedException("SGR-003","Invalid contact number!");
         }
 
-        if(customerDao.userByContactNumber(userEntity.getContactNumber())!=null){
+        if(customerDao.getUserByContactNumber(userEntity.getContactNumber())!=null){
             throw new SignUpRestrictedException("SGR-001","This contact number is already registered! Try other contact number.");
         }
         if(!isValidEmailFormat(userEntity.getEmail())){
@@ -64,7 +64,8 @@ public class CustomerService {
     //Authenticate user
     public CustomerAuthEntity authenticate(String username, String password) throws AuthenticationFailedException {
 
-        CustomerEntity loggedCustomer = customerDao.userByContactNumber(username);
+        CustomerEntity loggedCustomer = customerDao.getUserByContactNumber(username);
+
         if(loggedCustomer ==null){
             throw new AuthenticationFailedException("ATHR-001","This contact number has not been registered!");
         }
@@ -102,14 +103,12 @@ public class CustomerService {
             throw new AuthorizationFailedException("ATHR-002","Customer is logged out. Log in again to access this endpoint.");
         }
 
-
-        if (loggedUserAuthTokenEntity.getExpiresAt().compareTo(ZonedDateTime.now()) > 0) {
-            loggedUserAuthTokenEntity.setLogoutAt(ZonedDateTime.now());
-            return customerAuthDao.userSignOut(loggedUserAuthTokenEntity);
-        } else {
+        if (loggedUserAuthTokenEntity.getExpiresAt().compareTo(ZonedDateTime.now()) < 0) {
             throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
 
+        loggedUserAuthTokenEntity.setLogoutAt(ZonedDateTime.now());
+        return customerAuthDao.userSignOut(loggedUserAuthTokenEntity);
     }
 
     //Get customer entity based on signed-in user
@@ -132,7 +131,7 @@ public class CustomerService {
             throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
 
-        return new CustomerEntity();
+        return loggedUserAuthTokenEntity.getCustomer();
     }
 
     //Customer name update
@@ -149,7 +148,7 @@ public class CustomerService {
 
         if (loggedUserAuthTokenEntity.getExpiresAt().compareTo(ZonedDateTime.now()) > 0) {
             String loggedCustomerContact =  loggedUserAuthTokenEntity.getCustomer().getContactNumber();
-            CustomerEntity loggedCustomerEntity = customerDao.userByContactNumber(loggedCustomerContact);
+            CustomerEntity loggedCustomerEntity = customerDao.getUserByContactNumber(loggedCustomerContact);
 
             if(customerEntity.getFirstName()!=null) {
                 loggedCustomerEntity.setFirstName(customerEntity.getFirstName());
@@ -184,7 +183,7 @@ public class CustomerService {
 
         if (loggedUserAuthTokenEntity.getExpiresAt().compareTo(ZonedDateTime.now()) > 0) {
             String loggedCustomerContact =  loggedUserAuthTokenEntity.getCustomer().getContactNumber();
-            CustomerEntity loggedCustomerEntity = customerDao.userByContactNumber(loggedCustomerContact);
+            CustomerEntity loggedCustomerEntity = customerDao.getUserByContactNumber(loggedCustomerContact);
 
             //Check password strength
             if(!passwordChecker(loggedCustomerEntity.getPassword())){

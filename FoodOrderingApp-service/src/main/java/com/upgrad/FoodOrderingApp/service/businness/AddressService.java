@@ -30,6 +30,16 @@ public class AddressService {
     @Autowired
     private StateService stateService;
 
+    //Get an address by UUid
+    public AddressEntity getAddressByUUID(final String addressUuid) throws AddressNotFoundException {
+
+        AddressEntity foundAddress = addressDao.getAddressByUuid(addressUuid);
+        if(foundAddress==null){
+            throw new AddressNotFoundException("ANF-003","No address by this id");
+        }
+        return foundAddress;
+    }
+
     //Save address service
     public AddressEntity saveAddress(String accessToken, AddressEntity addressDetails) throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
 

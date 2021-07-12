@@ -8,7 +8,9 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 @Entity
 @Table(name="restaurant")
@@ -50,6 +52,28 @@ public class RestaurantEntity {
     @OneToOne
     @JoinColumn(name ="address_id")
     private AddressEntity address;
+
+    @OneToMany(mappedBy = "restaurantEntity", cascade = CascadeType.ALL)
+    private Set<RestaurantItemEntity> restaurantItemEntities = new HashSet<>();
+
+    public Set<RestaurantItemEntity> getRestaurantItemEntities() {
+        return restaurantItemEntities;
+    }
+
+    public void setRestaurantItemEntities(Set<RestaurantItemEntity> restaurantItemEntities) {
+        this.restaurantItemEntities = restaurantItemEntities;
+    }
+
+    @OneToMany(mappedBy = "restaurantEntity", cascade = CascadeType.ALL)
+    private Set<RestaurantCategoryEntity> restaurantCategoryEntities = new HashSet<>();
+
+    public Set<RestaurantCategoryEntity> getRestaurantCategoryEntities() {
+        return restaurantCategoryEntities;
+    }
+
+    public void setRestaurantCategoryEntities(Set<RestaurantCategoryEntity> restaurantCategoryEntities) {
+        this.restaurantCategoryEntities = restaurantCategoryEntities;
+    }
 
     public double getCustomerRating() {
         return customerRating;

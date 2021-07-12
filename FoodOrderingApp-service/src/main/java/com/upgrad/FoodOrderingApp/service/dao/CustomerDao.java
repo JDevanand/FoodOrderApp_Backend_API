@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.persistence.EntityManager;
+import javax.persistence.NamedQuery;
 import javax.persistence.NoResultException;
 import javax.persistence.PersistenceContext;
 
@@ -24,13 +25,24 @@ public class CustomerDao {
     }
 
     //Get user by contact number
-    public CustomerEntity userByContactNumber(final String contactNumber) {
+    public CustomerEntity getUserByContactNumber(final String contactNumber) {
         try {
             return entityManager.createNamedQuery("userByContactNumber", CustomerEntity.class).setParameter("contactNumber", contactNumber)
                     .getSingleResult();
         } catch (NoResultException nre) {
             return null;
         }
+    }
+
+    //Get customer by uuid
+    public CustomerEntity getUserByUuid(final String customerUuid){
+        try{
+            return entityManager.createNamedQuery("userByUuid", CustomerEntity.class).setParameter("uuid", customerUuid)
+                    .getSingleResult();
+        }catch (NoResultException nre){
+            return null;
+        }
+
     }
 
     //update Customer

@@ -3,12 +3,14 @@ package com.upgrad.FoodOrderingApp.api.controller;
 import com.upgrad.FoodOrderingApp.api.model.*;
 import com.upgrad.FoodOrderingApp.service.businness.CategoryService;
 import com.upgrad.FoodOrderingApp.service.businness.CustomerService;
+import com.upgrad.FoodOrderingApp.service.businness.ItemService;
 import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
 import com.upgrad.FoodOrderingApp.service.entity.CategoryEntity;
 import com.upgrad.FoodOrderingApp.service.entity.CustomerEntity;
+import com.upgrad.FoodOrderingApp.service.entity.ItemEntity;
 import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
-import com.upgrad.FoodOrderingApp.service.exception.AddressNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.AuthorizationFailedException;
+import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
 import com.upgrad.FoodOrderingApp.service.exception.InvalidRatingException;
 import com.upgrad.FoodOrderingApp.service.exception.RestaurantNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,6 +37,9 @@ public class RestaurantController {
 
     @Autowired
     private CustomerService customerService;
+
+    @Autowired
+    private ItemService itemService;
 
     //Fetch all restaurants
     @CrossOrigin
@@ -88,15 +93,63 @@ public class RestaurantController {
         return new ResponseEntity<>(restaurantListResponse, HttpStatus.OK);
     }
 
-    //Fetch restaurant by UUID along with items
+    //Fetch restaurant by UUID along with items based on restaurant and category
+    ///12312//.............
     @CrossOrigin
     @RequestMapping(path = "/api/restaurant/{restaurant_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<RestaurantDetailsResponse> getRestaurantByUuid(@PathVariable("restaurant_id") final String restaurantUuid) throws RestaurantNotFoundException {
+    public ResponseEntity<RestaurantDetailsResponse> getRestaurantByUuid(@PathVariable("restaurant_id") final String restaurantUuid , @RequestHeader("authorization ") final String authorization) throws RestaurantNotFoundException, AuthorizationFailedException, CategoryNotFoundException {
+
+        //needs to be changed to bearer authorization//..............
+        CustomerEntity loggedCustomer = customerService.getCustomer(authorization);
 
         RestaurantEntity fetchedRestaurant = restaurantService.restaurantByUUID(restaurantUuid);
-
-
         RestaurantDetailsResponse restaurantDetailsResponse = new RestaurantDetailsResponse();
+
+            restaurantDetailsResponse.setId(UUID.fromString(fetchedRestaurant.getUuid()));
+            restaurantDetailsResponse.setRestaurantName(fetchedRestaurant.getRestaurantName());
+            restaurantDetailsResponse.setPhotoURL(fetchedRestaurant.getPhotoUrl());
+            restaurantDetailsResponse.setCustomerRating(BigDecimal.valueOf(fetchedRestaurant.getCustomerRating()));
+            restaurantDetailsResponse.setAveragePrice(fetchedRestaurant.getAvgPrice());
+            restaurantDetailsResponse.setNumberCustomersRated(fetchedRestaurant.getNumberCustomersRated());
+
+            RestaurantDetailsResponseAddress restaurantAddress = new RestaurantDetailsResponseAddress();
+            restaurantAddress.setId(UUID.fromString(fetchedRestaurant.getAddress().getUuid()));
+            restaurantAddress.setFlatBuildingName(fetchedRestaurant.getAddress().getFlatBuildingNumber());
+            restaurantAddress.setLocality(fetchedRestaurant.getAddress().getLocality());
+            restaurantAddress.setCity(fetchedRestaurant.getAddress().getCity());
+            restaurantAddress.setPincode(fetchedRestaurant.getAddress().getPincode());
+
+            RestaurantDetailsResponseAddressState restAddState = new RestaurantDetailsResponseAddressState();
+            restAddState.setId(UUID.fromString(fetchedRestaurant.getAddress().getState().getUuid()));
+            restAddState.setStateName(fetchedRestaurant.getAddress().getState().getStateName());
+
+            restaurantAddress.setState(restAddState);
+            restaurantDetailsResponse.setAddress(restaurantAddress);
+
+            List<CategoryEntity> restaurantCategory = categoryService.getCategoriesByRestaurant(restaurantUuid);
+            List<CategoryList> categoryLists = new ArrayList<>();
+
+             //method to fetch item by cat & rest and then update  to cat list
+            for(CategoryEntity ce : restaurantCategory ){
+                CategoryList cl = new CategoryList();
+                cl.setId(UUID.fromString(ce.getUuid()));
+                cl.setCategoryName(ce.getCategoryName());
+
+                List<ItemEntity> itemEntities = itemService.getItemsByCategoryAndRestaurant(fetchedRestaurant.getUuid(),ce.getUuid());
+                List<ItemList> itemLists = new ArrayList<>();
+                for(ItemEntity itmety : itemEntities){
+                    ItemList itemEntitycat = new ItemList();
+                    itemEntitycat.setId(UUID.fromString(itmety.getUuid()));
+                    itemEntitycat.setItemName(itmety.getItemName());
+                    itemEntitycat.setPrice(itmety.getPrice());
+                    //itemEntitycat.setItemType(itmety.getType()); // <<enum  type to be  resolved>>/
+                    itemLists.add(itemEntitycat);
+                }
+                cl.setItemList(itemLists);
+
+                categoryLists.add(cl);
+            }
+        restaurantDetailsResponse.setCategories(categoryLists);
 
         return new ResponseEntity<>(restaurantDetailsResponse, HttpStatus.OK);
     }
@@ -107,7 +160,7 @@ public class RestaurantController {
     public ResponseEntity<RestaurantUpdatedResponse> updateRestaurantRating(@PathVariable("restaurant_id") final String restaurantUuid
             , @RequestHeader("authorization ") final String authorization, @RequestParam("customer_rating") final double customerRating) throws RestaurantNotFoundException, AuthorizationFailedException, InvalidRatingException {
 
-
+        //needs to be changed to bearer authorization//..............
         CustomerEntity loggedCustomer = customerService.getCustomer(authorization);
         RestaurantEntity fetchedRestaurant = restaurantService.restaurantByUUID(restaurantUuid);
 
