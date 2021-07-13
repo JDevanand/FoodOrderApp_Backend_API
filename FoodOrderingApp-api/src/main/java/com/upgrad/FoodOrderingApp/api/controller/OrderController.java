@@ -64,7 +64,7 @@ public class OrderController {
 
         CustomerEntity loggedCustomer = customerService.getCustomer(authorization);
         PaymentEntity payment = paymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
-        AddressEntity address = addressService.getAddressByUUID(saveOrderRequest.getAddressId());
+        AddressEntity address = addressService.getAddressByUUID(saveOrderRequest.getAddressId(),loggedCustomer);
         RestaurantEntity restaurant = restaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString());
 
         OrderEntity newOrder = new OrderEntity();
@@ -146,7 +146,7 @@ public class OrderController {
 
             OrderListAddress customerOLAddress = new OrderListAddress();
             customerOLAddress.setId(UUID.fromString(eachOrderEntity.getAddress().getUuid()));
-            customerOLAddress.setFlatBuildingName(eachOrderEntity.getAddress().getFlatBuildingNumber());
+            customerOLAddress.setFlatBuildingName(eachOrderEntity.getAddress().getFlatBuilNo());
             customerOLAddress.setLocality(eachOrderEntity.getAddress().getLocality());
             customerOLAddress.setCity(eachOrderEntity.getAddress().getCity());
             customerOLAddress.setPincode(eachOrderEntity.getAddress().getPincode());

@@ -10,7 +10,6 @@ import org.hibernate.annotations.OnDeleteAction;
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -35,7 +34,7 @@ public class AddressEntity {
 
     @Column(name ="flat_buil_number")
     @Size(max=255)
-    private String flatBuildingNumber;
+    private String flatBuilNo;
 
     @Column(name ="locality")
     @Size(max=255)
@@ -85,12 +84,12 @@ public class AddressEntity {
     }
 
 
-    public String getFlatBuildingNumber() {
-        return flatBuildingNumber;
+    public String getFlatBuilNo() {
+        return flatBuilNo;
     }
 
-    public void setFlatBuildingNumber(String flatBuildingNumber) {
-        this.flatBuildingNumber = flatBuildingNumber;
+    public void setFlatBuilNo(String flatBuilNo) {
+        this.flatBuilNo = flatBuilNo;
     }
 
     public String getLocality() {

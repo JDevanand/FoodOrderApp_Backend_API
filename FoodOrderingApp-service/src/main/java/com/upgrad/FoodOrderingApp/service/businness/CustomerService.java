@@ -35,9 +35,6 @@ public class CustomerService {
     //Throws exception if user name or email id is already registered.
     public CustomerEntity saveCustomer(CustomerEntity userEntity) throws SignUpRestrictedException {
 
-        String[] encryptedText = cryptographyProvider.encrypt(userEntity.getPassword());
-        userEntity.setSalt(encryptedText[0]);
-        userEntity.setPassword(encryptedText[1]);
 
         if(userEntity.getFirstName()==null || userEntity.getContactNumber()==null ||userEntity.getPassword()==null || userEntity.getEmail()==null){
             throw new SignUpRestrictedException("SGR-005","Except lastname all fields should be filled");
@@ -46,6 +43,9 @@ public class CustomerService {
         if(!passwordChecker(userEntity.getPassword())){
             throw new SignUpRestrictedException("SGR-004","Weak password!");
         }
+        String[] encryptedText = cryptographyProvider.encrypt(userEntity.getPassword());
+        userEntity.setSalt(encryptedText[0]);
+        userEntity.setPassword(encryptedText[1]);
 
         if(!contactNumberFormatChecker(userEntity.getContactNumber())){
             throw new SignUpRestrictedException("SGR-003","Invalid contact number!");
@@ -94,21 +94,10 @@ public class CustomerService {
     //User sign out after bearer authentication using access token
     public CustomerAuthEntity logout(final String accessToken) throws AuthorizationFailedException {
 
-        CustomerAuthEntity loggedUserAuthTokenEntity = customerAuthDao.getUserAuthToken(accessToken);
-        if(loggedUserAuthTokenEntity ==null){
-            throw new AuthorizationFailedException("ATHR-001","Customer is not Logged in.");
-        }
-
-        if(loggedUserAuthTokenEntity.getLogoutAt() !=null){
-            throw new AuthorizationFailedException("ATHR-002","Customer is logged out. Log in again to access this endpoint.");
-        }
-
-        if (loggedUserAuthTokenEntity.getExpiresAt().compareTo(ZonedDateTime.now()) < 0) {
-            throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
-        }
-
+        CustomerAuthEntity loggedUserAuthTokenEntity = bearerAuthentication(accessToken);
         loggedUserAuthTokenEntity.setLogoutAt(ZonedDateTime.now());
         return customerAuthDao.userSignOut(loggedUserAuthTokenEntity);
+
     }
 
     //Get customer entity based on signed-in user
@@ -118,6 +107,49 @@ public class CustomerService {
         String[] splitString = authorization.split(" ");
         String accessToken = splitString[1];
 
+        CustomerAuthEntity loggedUserAuthTokenEntity = bearerAuthentication(accessToken);
+        return loggedUserAuthTokenEntity.getCustomer();
+    }
+
+    //Customer name update
+    public CustomerEntity updateCustomer(final CustomerEntity customerEntity) throws AuthorizationFailedException, UpdateCustomerException {
+
+            if(customerEntity.getFirstName().isEmpty()){
+                throw new UpdateCustomerException("UCR-002","First name field should not be empty");
+            }
+
+            return customerDao.updateCustomer(customerEntity);
+
+    }
+
+    //Customer password update
+    public CustomerEntity updateCustomerPassword(final String oldPassword,final String newPassword, final CustomerEntity customerEntity) throws AuthorizationFailedException, UpdateCustomerException {
+
+        if(oldPassword == null || newPassword ==null) {
+            throw new UpdateCustomerException("UCR-003","No field should be empty");
+        }
+
+            //Check password strength
+            if(!passwordChecker(newPassword)){
+                throw new UpdateCustomerException("UCR-001","Weak password!");
+            }
+
+            //Check old password matches
+            final String encryptedPassword = cryptographyProvider.encrypt(oldPassword, customerEntity.getSalt());
+            if(!encryptedPassword.equals(customerEntity.getPassword())){
+                throw new UpdateCustomerException("UCR-004","Incorrect old password!");
+            }
+
+            //update new password
+            String[] encryptedText = cryptographyProvider.encrypt(newPassword);
+            customerEntity.setSalt(encryptedText[0]);
+            customerEntity.setPassword(encryptedText[1]);
+
+            return customerDao.updateCustomer(customerEntity);
+    }
+
+    public CustomerAuthEntity bearerAuthentication(final String accessToken) throws AuthorizationFailedException {
+
         CustomerAuthEntity loggedUserAuthTokenEntity = customerAuthDao.getUserAuthToken(accessToken);
         if(loggedUserAuthTokenEntity ==null){
             throw new AuthorizationFailedException("ATHR-001","Customer is not Logged in.");
@@ -131,81 +163,7 @@ public class CustomerService {
             throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
         }
 
-        return loggedUserAuthTokenEntity.getCustomer();
-    }
-
-    //Customer name update
-    public CustomerEntity updateCustomer(final String accessToken, final CustomerEntity customerEntity) throws AuthorizationFailedException, UpdateCustomerException {
-
-        CustomerAuthEntity loggedUserAuthTokenEntity = customerAuthDao.getUserAuthToken(accessToken);
-        if(loggedUserAuthTokenEntity ==null){
-            throw new AuthorizationFailedException("ATHR-001","Customer is not Logged in.");
-        }
-
-        if(loggedUserAuthTokenEntity.getLogoutAt() !=null){
-            throw new AuthorizationFailedException("ATHR-002","Customer is logged out. Log in again to access this endpoint.");
-        }
-
-        if (loggedUserAuthTokenEntity.getExpiresAt().compareTo(ZonedDateTime.now()) > 0) {
-            String loggedCustomerContact =  loggedUserAuthTokenEntity.getCustomer().getContactNumber();
-            CustomerEntity loggedCustomerEntity = customerDao.getUserByContactNumber(loggedCustomerContact);
-
-            if(customerEntity.getFirstName()!=null) {
-                loggedCustomerEntity.setFirstName(customerEntity.getFirstName());
-            } else{
-                throw new UpdateCustomerException("UCR-002","First name field should not be empty");
-            }
-
-            loggedCustomerEntity.setLastName(customerEntity.getLastName());
-
-            return customerDao.updateCustomer(loggedCustomerEntity);
-        } else {
-            throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
-        }
-
-    }
-
-    //Customer password update
-    public CustomerEntity updateCustomerPassword(final String accessToken, final String oldPassword,final String newPassword) throws AuthorizationFailedException, UpdateCustomerException {
-
-        if(oldPassword ==null || newPassword==null) {
-            throw new UpdateCustomerException("UCR-003","No field should be empty");
-        }
-
-        CustomerAuthEntity loggedUserAuthTokenEntity = customerAuthDao.getUserAuthToken(accessToken);
-        if(loggedUserAuthTokenEntity ==null){
-            throw new AuthorizationFailedException("ATHR-001","Customer is not Logged in.");
-        }
-
-        if(loggedUserAuthTokenEntity.getLogoutAt() !=null){
-            throw new AuthorizationFailedException("ATHR-002","Customer is logged out. Log in again to access this endpoint.");
-        }
-
-        if (loggedUserAuthTokenEntity.getExpiresAt().compareTo(ZonedDateTime.now()) > 0) {
-            String loggedCustomerContact =  loggedUserAuthTokenEntity.getCustomer().getContactNumber();
-            CustomerEntity loggedCustomerEntity = customerDao.getUserByContactNumber(loggedCustomerContact);
-
-            //Check password strength
-            if(!passwordChecker(loggedCustomerEntity.getPassword())){
-                throw new UpdateCustomerException("UCR-001)","Weak password!");
-            }
-
-            //Check old password matches
-            final String encryptedPassword = cryptographyProvider.encrypt(oldPassword, loggedCustomerEntity.getSalt());
-            if(!encryptedPassword.equals(loggedCustomerEntity.getPassword())){
-                throw new UpdateCustomerException("UCR-004","Incorrect old password!");
-            }
-
-            //update new password
-                String[] encryptedText = cryptographyProvider.encrypt(newPassword);
-                loggedCustomerEntity.setSalt(encryptedText[0]);
-                loggedCustomerEntity.setPassword(encryptedText[1]);
-
-            return customerDao.updateCustomer(loggedCustomerEntity);
-        } else {
-            throw new AuthorizationFailedException("ATHR-003", "Your session is expired. Log in again to access this endpoint.");
-        }
-
+        return loggedUserAuthTokenEntity;
     }
 
     //Password Strength checker

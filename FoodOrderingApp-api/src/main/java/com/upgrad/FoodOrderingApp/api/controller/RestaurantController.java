@@ -62,7 +62,7 @@ public class RestaurantController {
 
             RestaurantDetailsResponseAddress restaurantAddress = new RestaurantDetailsResponseAddress();
             restaurantAddress.setId(UUID.fromString(restaurant.getAddress().getUuid()));
-            restaurantAddress.setFlatBuildingName(restaurant.getAddress().getFlatBuildingNumber());
+            restaurantAddress.setFlatBuildingName(restaurant.getAddress().getFlatBuilNo());
             restaurantAddress.setLocality(restaurant.getAddress().getLocality());
             restaurantAddress.setCity(restaurant.getAddress().getCity());
             restaurantAddress.setPincode(restaurant.getAddress().getPincode());
@@ -114,7 +114,7 @@ public class RestaurantController {
 
             RestaurantDetailsResponseAddress restaurantAddress = new RestaurantDetailsResponseAddress();
             restaurantAddress.setId(UUID.fromString(fetchedRestaurant.getAddress().getUuid()));
-            restaurantAddress.setFlatBuildingName(fetchedRestaurant.getAddress().getFlatBuildingNumber());
+            restaurantAddress.setFlatBuildingName(fetchedRestaurant.getAddress().getFlatBuilNo());
             restaurantAddress.setLocality(fetchedRestaurant.getAddress().getLocality());
             restaurantAddress.setCity(fetchedRestaurant.getAddress().getCity());
             restaurantAddress.setPincode(fetchedRestaurant.getAddress().getPincode());
@@ -195,7 +195,7 @@ public class RestaurantController {
 
             RestaurantDetailsResponseAddress restaurantAddress = new RestaurantDetailsResponseAddress();
             restaurantAddress.setId(UUID.fromString(restaurant.getAddress().getUuid()));
-            restaurantAddress.setFlatBuildingName(restaurant.getAddress().getFlatBuildingNumber());
+            restaurantAddress.setFlatBuildingName(restaurant.getAddress().getFlatBuilNo());
             restaurantAddress.setLocality(restaurant.getAddress().getLocality());
             restaurantAddress.setCity(restaurant.getAddress().getCity());
             restaurantAddress.setPincode(restaurant.getAddress().getPincode());
@@ -247,7 +247,7 @@ public class RestaurantController {
 
             RestaurantDetailsResponseAddress restaurantAddress = new RestaurantDetailsResponseAddress();
             restaurantAddress.setId(UUID.fromString(restaurant.getAddress().getUuid()));
-            restaurantAddress.setFlatBuildingName(restaurant.getAddress().getFlatBuildingNumber());
+            restaurantAddress.setFlatBuildingName(restaurant.getAddress().getFlatBuilNo());
             restaurantAddress.setLocality(restaurant.getAddress().getLocality());
             restaurantAddress.setCity(restaurant.getAddress().getCity());
             restaurantAddress.setPincode(restaurant.getAddress().getPincode());
