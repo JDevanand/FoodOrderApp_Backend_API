@@ -1,4 +1,4 @@
-/*
+
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -52,7 +52,7 @@ public class ItemControllerTest {
         final ItemEntity itemEntity = new ItemEntity();
         final String itemId = UUID.randomUUID().toString();
         itemEntity.setUuid(itemId);
-        itemEntity.setType(NON_VEG);
+        itemEntity.setItemType(NON_VEG);
         when(mockItemService.getItemsByPopularity(restaurantEntity))
                 .thenReturn(Collections.singletonList(itemEntity));
 
@@ -82,5 +82,3 @@ public class ItemControllerTest {
     }
 
 }
-
-*/

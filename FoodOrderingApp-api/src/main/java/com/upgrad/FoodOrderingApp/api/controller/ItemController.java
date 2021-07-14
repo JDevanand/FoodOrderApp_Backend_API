@@ -4,6 +4,7 @@ import com.upgrad.FoodOrderingApp.api.model.ItemList;
 import com.upgrad.FoodOrderingApp.api.model.ItemListResponse;
 import com.upgrad.FoodOrderingApp.service.businness.ItemService;
 import com.upgrad.FoodOrderingApp.service.businness.RestaurantService;
+import com.upgrad.FoodOrderingApp.service.common.ItemType;
 import com.upgrad.FoodOrderingApp.service.entity.ItemEntity;
 import com.upgrad.FoodOrderingApp.service.entity.RestaurantEntity;
 import com.upgrad.FoodOrderingApp.service.exception.RestaurantNotFoundException;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.UUID;
 
 @RestController
 @RequestMapping("/")
@@ -35,9 +37,18 @@ public class ItemController {
         List<ItemEntity> topFiveItems = itemService.getItemsByPopularity(fetchedRestaurant);
 
         List<ItemList> itemLists = new ArrayList<>();
+        for(ItemEntity items: topFiveItems){
+            ItemList itmlist = new ItemList();
+            itmlist.setId(UUID.fromString(items.getUuid()));
+            itmlist.setItemName(items.getItemName());
+            itmlist.setPrice(items.getPrice());
+            for(ItemList.ItemTypeEnum itmtype : ItemList.ItemTypeEnum.values()) {
+                if (items.getItemType().toString().equals(itmtype.toString())) itmlist.setItemType(itmtype);
+            }
+            itemLists.add(itmlist);
+        }
 
         ItemListResponse itemListResponse = new ItemListResponse();
-
 
         return new ResponseEntity<>(itemListResponse, HttpStatus.OK);
     }

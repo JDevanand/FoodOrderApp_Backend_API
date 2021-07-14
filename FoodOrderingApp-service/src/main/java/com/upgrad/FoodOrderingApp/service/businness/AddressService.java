@@ -40,7 +40,7 @@ public class AddressService {
     //Get an address by UUid
     public AddressEntity getAddressByUUID(final String addressUuid, final CustomerEntity customerEntity) throws AddressNotFoundException, AuthorizationFailedException {
 
-        if(addressUuid == null){
+        if(addressUuid.isEmpty()){
             throw new AddressNotFoundException("ANF-005","Address id can not be empty");
         }
 
@@ -67,9 +67,9 @@ public class AddressService {
         CustomerEntity loggedCustomerEntity = customerService.getCustomer(authorization);
 
            //Check if any field is empty
-            if(addressDetails.getPincode()==null || addressDetails.getCity()==null
-            || addressDetails.getLocality()==null || addressDetails.getFlatBuilNo()==null
-            ||addressDetails.getState()==null){
+            if(addressDetails.getPincode().isEmpty() || addressDetails.getCity().isEmpty()
+            || addressDetails.getLocality().isEmpty()|| addressDetails.getFlatBuilNo().isEmpty()
+            ||addressDetails.getState().getUuid().isEmpty()){
                 throw new SaveAddressException("SAR-001","No field can be empty");
             }
 
@@ -84,6 +84,7 @@ public class AddressService {
 
             //Save address details in address db
             AddressEntity createdAddress = addressDao.createAddress(addressDetails);
+
 
             //Save address and customer relation in customer_address db
             CustomerAddressEntity createCAEntity = new CustomerAddressEntity();

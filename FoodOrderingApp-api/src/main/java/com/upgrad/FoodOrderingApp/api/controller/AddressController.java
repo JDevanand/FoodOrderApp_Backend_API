@@ -86,7 +86,7 @@ public class AddressController {
 
     }
 
-    //Delete question endpoint
+    //Delete address endpoint
     @CrossOrigin
     @RequestMapping(path="/address/{address_id}",method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<DeleteAddressResponse> deleteAddress(@RequestHeader("authorization") final String authorization, @PathVariable("address_id") final String addressUuid) throws AuthorizationFailedException, AddressNotFoundException {

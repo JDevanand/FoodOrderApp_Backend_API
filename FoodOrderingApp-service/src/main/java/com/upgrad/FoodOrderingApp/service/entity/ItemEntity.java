@@ -1,15 +1,10 @@
 package com.upgrad.FoodOrderingApp.service.entity;
 
 import com.upgrad.FoodOrderingApp.service.common.ItemType;
-import org.apache.commons.lang3.builder.EqualsBuilder;
-import org.apache.commons.lang3.builder.HashCodeBuilder;
-import org.apache.commons.lang3.builder.ToStringBuilder;
-import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 
 @Entity
@@ -37,9 +32,10 @@ public class ItemEntity {
     @Column(name ="price")
     private Integer price;
 
+    @Enumerated(EnumType.ORDINAL)
     @Column(name ="type")
     @Size(max=10)
-    private String type;
+    private ItemType itemType;
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private Set<CategoryItemEntity> categoryItemEntities = new HashSet<>();
@@ -106,12 +102,12 @@ public class ItemEntity {
         this.price = price;
     }
 
-    public String getType() {
-        return type;
+    public ItemType getItemType() {
+        return itemType;
     }
 
-    public void setType(String type) {
-        this.type = type;
+    public void setItemType(ItemType itemType) {
+        this.itemType = itemType;
     }
 
 

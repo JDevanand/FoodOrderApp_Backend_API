@@ -58,7 +58,6 @@ public class ItemService {
 
     }
 
-
     //Get Item by uuid
     public ItemEntity getItemByUuid(final String itemUuid) throws ItemNotFoundException {
         ItemEntity fetchedItem =  itemDao.getItembyUuid(itemUuid);

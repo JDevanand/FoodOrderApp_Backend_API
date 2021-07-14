@@ -1,3 +1,4 @@
+/**
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
@@ -62,14 +63,14 @@ public class CategoryController {
             ItemList itm = new ItemList();
             itm.setId(UUID.fromString(items.getUuid()));
             itm.setItemName(items.getItemName());
-            itm.setItemType(ItemList.ItemTypeEnum.fromValue(items.getType()));
+            itm.setItemType(items.getType());
             itm.setPrice(items.getPrice());
             itemLists.add(itm);
         }
-
         categoriesDetailsResponse.setItemList(itemLists);
 
         return new ResponseEntity<>(categoriesDetailsResponse, HttpStatus.OK);
     }
 
 }
+**/
