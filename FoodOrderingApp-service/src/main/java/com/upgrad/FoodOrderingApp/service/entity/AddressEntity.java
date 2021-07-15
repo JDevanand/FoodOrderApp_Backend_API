@@ -23,6 +23,7 @@ import java.util.Set;
 
 public class AddressEntity {
 
+
     @Id
     @Column(name = "ID")
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -64,6 +65,22 @@ public class AddressEntity {
     }
 
     public void setCustomerAddressEntities(Set<CustomerAddressEntity> customerAddressEntities) {
+        this.customerAddressEntities = customerAddressEntities;
+    }
+
+    public AddressEntity(){
+
+    }
+
+    public AddressEntity(String addressId, String uuid, String someLocality, String someCity, String city, StateEntity stateEntity ) {
+        this.id = id;
+        this.uuid = uuid;
+        this.flatBuilNo = flatBuilNo;
+        this.locality = locality;
+        this.city = city;
+        this.pincode = pincode;
+        this.state = state;
+        this.active = active;
         this.customerAddressEntities = customerAddressEntities;
     }
 

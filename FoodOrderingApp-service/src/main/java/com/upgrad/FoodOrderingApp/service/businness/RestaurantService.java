@@ -41,7 +41,7 @@ public class RestaurantService {
     //Get restaurant details by UUID
     public RestaurantEntity restaurantByUUID(final String restaurantUuid) throws RestaurantNotFoundException {
 
-        if(restaurantUuid == null){
+       if(restaurantUuid==null){
             throw new RestaurantNotFoundException("RNF-002","Restaurant id field should not be empty");
         }
 
@@ -49,6 +49,7 @@ public class RestaurantService {
         if(fetchedRestaurant==null){
             throw new RestaurantNotFoundException("RNF-001","No restaurant by this id");
         }
+        System.out.println("restaurant service fetched");
         return fetchedRestaurant;
     }
 
@@ -73,7 +74,7 @@ public class RestaurantService {
     //Get restaurant based on category
     public List<RestaurantEntity> restaurantByCategory(final String categoryId) throws CategoryNotFoundException {
 
-        if(categoryId == null){
+        if(categoryId==null){
             throw new CategoryNotFoundException("CNF-001","Category id field should not be empty");
         }
 
@@ -102,7 +103,7 @@ public class RestaurantService {
         if(searchName == null){
             throw new RestaurantNotFoundException("RNF-003", "Restaurant name field should not be empty");
         }
-        String pattern = "%"+searchName+"%";
+        String pattern = "%"+searchName.toUpperCase()+"%";
         List<RestaurantEntity> fetchedRestaurantList = restaurantDao.getRestaurantByName(pattern);
 
         //Sort restaurant by name

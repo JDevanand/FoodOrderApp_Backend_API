@@ -31,6 +31,10 @@ public class CustomerController {
     @RequestMapping(path = "/customer/signup", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupCustomerResponse> signup(@RequestBody(required = false) final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException {
 
+        if(signupCustomerRequest==null){
+            throw new SignUpRestrictedException("SGR-005","Except lastname all fields should be filled");
+        }
+
         final CustomerEntity userEntity = new CustomerEntity();
 
         userEntity.setUuid(UUID.randomUUID().toString());
@@ -106,7 +110,11 @@ public class CustomerController {
     //Update customer endpoint
     @CrossOrigin
     @RequestMapping(path="/customer",method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UpdateCustomerResponse> updateCustomer(@RequestHeader("authorization") final String authorization, final UpdateCustomerRequest updateCustomerRequest) throws AuthorizationFailedException, UpdateCustomerException {
+    public ResponseEntity<UpdateCustomerResponse> updateCustomer(@RequestHeader("authorization") final String authorization, @RequestBody(required = false) UpdateCustomerRequest updateCustomerRequest) throws AuthorizationFailedException, UpdateCustomerException {
+
+        if(updateCustomerRequest==null){
+            throw new UpdateCustomerException("UCR-002","First name field should not be empty");
+        }
 
        CustomerEntity tobeUpdatedCustomer = customerService.getCustomer(authorization);
         tobeUpdatedCustomer.setFirstName(updateCustomerRequest.getFirstName());

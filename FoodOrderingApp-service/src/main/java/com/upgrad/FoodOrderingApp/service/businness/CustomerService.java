@@ -36,7 +36,7 @@ public class CustomerService {
     public CustomerEntity saveCustomer(CustomerEntity userEntity) throws SignUpRestrictedException {
 
 
-        if(userEntity.getFirstName()==null || userEntity.getContactNumber()==null ||userEntity.getPassword()==null || userEntity.getEmail()==null){
+        if(userEntity.getFirstName().isEmpty() || userEntity.getContactNumber().isEmpty() ||userEntity.getPassword().isEmpty() || userEntity.getEmail().isEmpty()){
             throw new SignUpRestrictedException("SGR-005","Except lastname all fields should be filled");
         }
 
@@ -112,7 +112,7 @@ public class CustomerService {
     }
 
     //Customer name update
-    public CustomerEntity updateCustomer(final CustomerEntity customerEntity) throws AuthorizationFailedException, UpdateCustomerException {
+    public CustomerEntity updateCustomer(final CustomerEntity customerEntity) throws UpdateCustomerException {
 
             if(customerEntity.getFirstName().isEmpty()){
                 throw new UpdateCustomerException("UCR-002","First name field should not be empty");

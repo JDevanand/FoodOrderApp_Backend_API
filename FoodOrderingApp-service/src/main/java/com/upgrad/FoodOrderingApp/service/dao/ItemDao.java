@@ -40,7 +40,7 @@ public class ItemDao {
         }
     }
 
-
+/*
     public List<ItemEntity> getTop5Item(final RestaurantEntity restaurant){
         try{
 
@@ -53,7 +53,7 @@ public class ItemDao {
             return  null;
         }
     }
-
+*/
 
 
 }

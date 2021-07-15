@@ -26,7 +26,7 @@ import org.springframework.test.web.servlet.MockMvc;
 import java.util.Collections;
 import java.util.UUID;
 
-//import static com.upgrad.FoodOrderingApp.service.common.ItemType.NON_VEG;
+import static com.upgrad.FoodOrderingApp.service.common.ItemType.NON_VEG;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.Mockito.*;
@@ -56,7 +56,7 @@ public class RestaurantControllerTest {
     @MockBean
     private CustomerService mockCustomerService;
 
-    /*
+   /*
     // ------------------------------------------ GET /restaurant/{restaurant_id} ------------------------------------------
 
     //This test case passes when you get restaurant details based on restaurant id.
@@ -211,7 +211,7 @@ public class RestaurantControllerTest {
     @Test
     public void shouldNotGetRestaurantsByCategoryIdIfCategoryDoesNotExistAgainstGivenId() throws Exception {
         when(mockRestaurantService.restaurantByCategory("someCategoryId"))
-                .thenThrow(new CategoryNotFoundException("CNF-002", "No category by this id"));
+                    .thenThrow(new CategoryNotFoundException("CNF-002", "No category by this id"));
 
         mockMvc
                 .perform(get("/restaurant/category/someCategoryId").contentType(MediaType.APPLICATION_JSON_UTF8_VALUE))
@@ -251,7 +251,7 @@ public class RestaurantControllerTest {
         verify(mockCategoryService, times(1)).getCategoriesByRestaurant(restaurantEntity.getUuid());
     }
 
-/*
+
     // ------------------------------------------ PUT /restaurant/{restaurant_id} ------------------------------------------
 
     //This test case passes when you are able to update restaurant rating successfully.
@@ -439,7 +439,7 @@ public class RestaurantControllerTest {
         final String itemId = UUID.randomUUID().toString();
         itemEntity.setUuid(itemId);
         itemEntity.setItemName("someItem");
-        itemEntity.setType(NON_VEG);
+        itemEntity.setItemType(NON_VEG);
         itemEntity.setPrice(200);
         return itemEntity;
     }

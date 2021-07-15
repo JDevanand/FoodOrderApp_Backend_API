@@ -13,12 +13,10 @@ public class RestExceptionHandler {
 
     @ExceptionHandler(SignUpRestrictedException.class)
     public ResponseEntity<ErrorResponse> signUpRestrictedException(SignUpRestrictedException exe, WebRequest request) {
-        /*
-        ErrorResponse errorResponse = new ErrorResponse();
-        errorResponse.setCode(exe.getCode());
-        errorResponse.setMessage(exe.getErrorMessage());
-        */
-        return new ResponseEntity<>(new ErrorResponse().code(exe.getCode()).message((exe.getErrorMessage())), HttpStatus.BAD_REQUEST);
+
+        return new ResponseEntity<>(
+                new ErrorResponse().code(exe.getCode()).message((exe.getErrorMessage())), HttpStatus.BAD_REQUEST
+        );
     }
 
     @ExceptionHandler(AuthenticationFailedException.class)
@@ -69,7 +67,7 @@ public class RestExceptionHandler {
     @ExceptionHandler(CategoryNotFoundException.class)
     public ResponseEntity<ErrorResponse> categoryNotFoundException(CategoryNotFoundException exe, WebRequest webRequest){
         return new ResponseEntity<>(
-                new ErrorResponse().code(exe.getCode()).message((exe.getErrorMessage())), HttpStatus.BAD_REQUEST
+                new ErrorResponse().code(exe.getCode()).message((exe.getErrorMessage())), HttpStatus.NOT_FOUND
         );
     }
 
