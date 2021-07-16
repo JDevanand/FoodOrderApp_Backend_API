@@ -62,9 +62,9 @@ public class AddressService {
     }
 
     //Save address service
-    public AddressEntity saveAddress(String authorization, AddressEntity addressDetails) throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
+    public AddressEntity saveAddress(CustomerEntity loggedCustomerEntity, AddressEntity addressDetails) throws AuthorizationFailedException, SaveAddressException, AddressNotFoundException {
 
-        CustomerEntity loggedCustomerEntity = customerService.getCustomer(authorization);
+        //CustomerEntity loggedCustomerEntity = customerService.getCustomer(authorization);
 
            //Check if any field is empty
             if(addressDetails.getPincode().isEmpty() || addressDetails.getCity().isEmpty()

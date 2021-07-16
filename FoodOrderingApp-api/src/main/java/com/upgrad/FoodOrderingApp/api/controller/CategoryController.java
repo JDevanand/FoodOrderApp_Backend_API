@@ -1,4 +1,4 @@
-/**
+
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.upgrad.FoodOrderingApp.api.model.*;
@@ -47,15 +47,9 @@ public class CategoryController {
     public ResponseEntity<CategoryDetailsResponse> getCategoryByUuid(@PathVariable("category_id")final String categoryUuid) throws CategoryNotFoundException {
 
         CategoryEntity fetchedCategory = categoryService.getCategoryById(categoryUuid);
-
-        //
-        System.out.println(fetchedCategory);
-
         CategoryDetailsResponse categoriesDetailsResponse = new CategoryDetailsResponse();
         categoriesDetailsResponse.setId(UUID.fromString(fetchedCategory.getUuid()));
         categoriesDetailsResponse.setCategoryName(fetchedCategory.getCategoryName());
-
-        //List<CategoryItemEntity> itemsTaggedToCategory = categoryService.getItemsbyCategoryId(fetchedCategory);
 
         List<ItemEntity> itemsTaggedToCategory = categoryService.getItemsbyCategoryId(fetchedCategory);
         List<ItemList> itemLists = new ArrayList<>();
@@ -63,7 +57,11 @@ public class CategoryController {
             ItemList itm = new ItemList();
             itm.setId(UUID.fromString(items.getUuid()));
             itm.setItemName(items.getItemName());
-            itm.setItemType(items.getType());
+
+            for(ItemList.ItemTypeEnum itmtype : ItemList.ItemTypeEnum.values()) {
+                if (items.getType().toString().equals(itmtype.toString())) itm.setItemType(itmtype);
+            }
+
             itm.setPrice(items.getPrice());
             itemLists.add(itm);
         }
@@ -73,4 +71,3 @@ public class CategoryController {
     }
 
 }
-**/

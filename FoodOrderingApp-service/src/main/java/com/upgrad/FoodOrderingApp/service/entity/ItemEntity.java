@@ -35,7 +35,14 @@ public class ItemEntity {
     @Enumerated(EnumType.ORDINAL)
     @Column(name ="type")
     @Size(max=10)
-    private ItemType itemType;
+    private ItemType type;
+    public ItemType getType() {
+        return type;
+    }
+
+    public void setType(ItemType type) {
+        this.type = type;
+    }
 
     @OneToMany(mappedBy = "item", cascade = CascadeType.ALL)
     private Set<CategoryItemEntity> categoryItemEntities = new HashSet<>();
@@ -101,32 +108,6 @@ public class ItemEntity {
     public void setPrice(Integer price) {
         this.price = price;
     }
-
-    public ItemType getItemType() {
-        return itemType;
-    }
-
-    public void setItemType(ItemType itemType) {
-        this.itemType = itemType;
-    }
-
-
-    /*
-    @Override
-    public boolean equals(Object obj) {
-        return new EqualsBuilder().append(this, obj).isEquals();
-    }
-
-    @Override
-    public int hashCode() {
-        return new HashCodeBuilder().append(this).hashCode();
-    }
-
-    @Override
-    public String toString() {
-        return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
-    }
-    */
 
 
 }

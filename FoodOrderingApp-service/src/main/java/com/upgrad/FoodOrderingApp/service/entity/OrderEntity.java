@@ -72,6 +72,20 @@ public class OrderEntity {
         this.orderItemEntities = orderItemEntities;
     }
 
+    public  OrderEntity(){
+
+    }
+
+    public OrderEntity(String orderId, double v, CouponEntity couponEntity, double v1, Date orderDate, PaymentEntity paymentEntity, CustomerEntity customerEntity, AddressEntity addressEntity, RestaurantEntity restaurantEntity) {
+            this.uuid = orderId;
+            this.coupon = couponEntity;
+            this.date = orderDate;
+            this.payment = paymentEntity;
+            this.address = addressEntity;
+            this.customer = customerEntity;
+            this.restaurant = restaurantEntity;
+    }
+
     public Integer getId() {
         return id;
     }

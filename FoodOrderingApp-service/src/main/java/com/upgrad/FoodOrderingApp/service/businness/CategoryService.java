@@ -33,7 +33,10 @@ public class CategoryService {
     public List<CategoryEntity> getAllCategoriesOrderedByName (){
 
         List<CategoryEntity> categoryEntityList = categoryDao.getAllCategory();
-        Collections.sort(categoryEntityList,CategoryService.CatNameComparator);
+        if(categoryEntityList==null) {
+            return null;
+        }
+        Collections.sort(categoryEntityList, CategoryService.CatNameComparator);
         return categoryEntityList;
     }
 

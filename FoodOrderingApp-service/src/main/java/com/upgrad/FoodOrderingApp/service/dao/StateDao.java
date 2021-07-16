@@ -28,7 +28,11 @@ public class StateDao {
 
     //Get all state
     public List<StateEntity> getAllStates(){
-        return entityManager.createNamedQuery("getAllStates",StateEntity.class).getResultList();
+        try {
+            return entityManager.createNamedQuery("getAllStates", StateEntity.class).getResultList();
+        }catch (NoResultException nre){
+            return null;
+        }
     }
 
 }

@@ -52,7 +52,7 @@ public class ItemControllerTest {
         final ItemEntity itemEntity = new ItemEntity();
         final String itemId = UUID.randomUUID().toString();
         itemEntity.setUuid(itemId);
-        itemEntity.setItemType(NON_VEG);
+        itemEntity.setType(NON_VEG);
         when(mockItemService.getItemsByPopularity(restaurantEntity))
                 .thenReturn(Collections.singletonList(itemEntity));
 

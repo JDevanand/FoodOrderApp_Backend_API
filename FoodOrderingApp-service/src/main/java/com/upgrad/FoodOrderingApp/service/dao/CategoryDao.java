@@ -16,7 +16,11 @@ public class CategoryDao {
 
     //Get all categories
     public List<CategoryEntity> getAllCategory(){
-        return entityManager.createNamedQuery("getAllCategories",CategoryEntity.class).getResultList();
+        try {
+            return entityManager.createNamedQuery("getAllCategories", CategoryEntity.class).getResultList();
+        } catch (NoResultException nre){
+            return null;
+        }
     }
 
     //Get category by UUID

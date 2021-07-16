@@ -43,7 +43,7 @@ public class ItemController {
             itmlist.setItemName(items.getItemName());
             itmlist.setPrice(items.getPrice());
             for(ItemList.ItemTypeEnum itmtype : ItemList.ItemTypeEnum.values()) {
-                if (items.getItemType().toString().equals(itmtype.toString())) itmlist.setItemType(itmtype);
+                if (items.getType().toString().equals(itmtype.toString())) itmlist.setItemType(itmtype);
             }
             itemLists.add(itmlist);
         }

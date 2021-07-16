@@ -33,8 +33,12 @@ public class AddressController {
     //Save new address
     @CrossOrigin
     @RequestMapping(path ="/address",method= RequestMethod.POST, produces= MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SaveAddressResponse> saveAddress(@RequestBody final SaveAddressRequest saveAddressRequest, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, AddressNotFoundException, SaveAddressException {
+    public ResponseEntity<SaveAddressResponse> saveAddress(@RequestBody(required = false) final SaveAddressRequest saveAddressRequest, @RequestHeader("authorization") final String authorization) throws AuthorizationFailedException, AddressNotFoundException, SaveAddressException {
 
+        String[] splitStrings = authorization.split(" ");
+        String accessToken = splitStrings[1];
+
+        CustomerEntity loggedCustomer = customerService.getCustomer(accessToken);
         AddressEntity receivedAddress = new AddressEntity();
         receivedAddress.setUuid(UUID.randomUUID().toString());
         receivedAddress.setFlatBuilNo(saveAddressRequest.getFlatBuildingName());
@@ -43,11 +47,10 @@ public class AddressController {
         receivedAddress.setPincode(saveAddressRequest.getPincode());
         receivedAddress.setActive(1);
 
-        StateEntity state = new StateEntity();
-        state.setUuid(saveAddressRequest.getStateUuid());
+        StateEntity state = addressService.getStateByUUID(saveAddressRequest.getStateUuid());
         receivedAddress.setState(state);
 
-        AddressEntity savedAddress = addressService.saveAddress(authorization, receivedAddress);
+        AddressEntity savedAddress = addressService.saveAddress(loggedCustomer, receivedAddress);
 
         SaveAddressResponse saveAddressResponse = new SaveAddressResponse();
         saveAddressResponse.setId(savedAddress.getUuid());
@@ -61,7 +64,10 @@ public class AddressController {
     @RequestMapping(path="/address/customer",method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<AddressListResponse> getAllAddress(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
 
-        CustomerEntity loggedCustomer = customerService.getCustomer(authorization);
+        String[] splitStrings = authorization.split(" ");
+        String accessToken = splitStrings[1];
+
+        CustomerEntity loggedCustomer = customerService.getCustomer(accessToken);
         List<AddressEntity> addressEntityList = addressService.getAllAddress(loggedCustomer);
         List<AddressList> addressLists = new ArrayList<>();
 
@@ -91,8 +97,11 @@ public class AddressController {
     @RequestMapping(path="/address/{address_id}",method = RequestMethod.DELETE, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<DeleteAddressResponse> deleteAddress(@RequestHeader("authorization") final String authorization, @PathVariable("address_id") final String addressUuid) throws AuthorizationFailedException, AddressNotFoundException {
 
-        CustomerEntity loggedCustomerEntity = customerService.getCustomer(authorization);
-        AddressEntity addressToBeDeleted = addressService.getAddressByUUID(addressUuid, loggedCustomerEntity);
+        String[] splitStrings = authorization.split(" ");
+        String accessToken = splitStrings[1];
+
+        CustomerEntity loggedCustomer = customerService.getCustomer(accessToken);
+        AddressEntity addressToBeDeleted = addressService.getAddressByUUID(addressUuid, loggedCustomer);
 
         AddressEntity deletedAddress = addressService.deleteAddress(addressToBeDeleted);
         DeleteAddressResponse deleteAddressResponse = new DeleteAddressResponse();
@@ -108,13 +117,18 @@ public class AddressController {
     public ResponseEntity<StatesListResponse> getAllStates(){
 
         List<StateEntity> stateEntityList = addressService.getAllStates();
+
         List<StatesList> statesLists = new ArrayList<>();
 
-        for(StateEntity stateEntity : stateEntityList ){
-            StatesList states = new StatesList();
-            states.setId(UUID.fromString(stateEntity.getUuid()));
-            states.setStateName(stateEntity.getStateName());
-            statesLists.add(states);
+        if(stateEntityList==null){
+            statesLists = null;
+        } else {
+            for (StateEntity stateEntity : stateEntityList) {
+                StatesList states = new StatesList();
+                states.setId(UUID.fromString(stateEntity.getUuid()));
+                states.setStateName(stateEntity.getStateName());
+                statesLists.add(states);
+            }
         }
 
         StatesListResponse statesListResponse = new StatesListResponse();

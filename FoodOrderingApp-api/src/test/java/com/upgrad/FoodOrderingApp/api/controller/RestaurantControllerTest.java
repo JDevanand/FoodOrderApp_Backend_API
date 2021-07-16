@@ -1,4 +1,4 @@
-/**
+
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -56,7 +56,7 @@ public class RestaurantControllerTest {
     @MockBean
     private CustomerService mockCustomerService;
 
-   /*
+
     // ------------------------------------------ GET /restaurant/{restaurant_id} ------------------------------------------
 
     //This test case passes when you get restaurant details based on restaurant id.
@@ -439,7 +439,7 @@ public class RestaurantControllerTest {
         final String itemId = UUID.randomUUID().toString();
         itemEntity.setUuid(itemId);
         itemEntity.setItemName("someItem");
-        itemEntity.setItemType(NON_VEG);
+        itemEntity.setType(NON_VEG);
         itemEntity.setPrice(200);
         return itemEntity;
     }
@@ -471,4 +471,3 @@ public class RestaurantControllerTest {
     }
 
 }
-*/

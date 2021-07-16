@@ -48,7 +48,6 @@ public class RestaurantController {
 
         List<RestaurantEntity> restaurantEntities = restaurantService.restaurantsByRating();
 
-        RestaurantListResponse restaurantListResponse = new RestaurantListResponse();
         List<RestaurantList> restaurantLists = new ArrayList<>();
 
         for (RestaurantEntity restaurant : restaurantEntities) {
@@ -88,6 +87,7 @@ public class RestaurantController {
             restaurantLists.add(restlist);
         }
 
+        RestaurantListResponse restaurantListResponse = new RestaurantListResponse();
         restaurantListResponse.restaurants(restaurantLists);
 
         return new ResponseEntity<>(restaurantListResponse, HttpStatus.OK);
@@ -97,16 +97,14 @@ public class RestaurantController {
     ///12312//.............
     @CrossOrigin
     @RequestMapping(path = "/api/restaurant/{restaurant_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<RestaurantDetailsResponse> getRestaurantByUuid(@RequestBody(required = false) final String restaurantUuid , @RequestHeader("authorization ") final String authorization) throws RestaurantNotFoundException, AuthorizationFailedException, CategoryNotFoundException {
+    public ResponseEntity<RestaurantDetailsResponse> getRestaurantByUuid(@PathVariable("restaurant_id") final String restaurantUuid , @RequestHeader("authorization") final String authorization) throws RestaurantNotFoundException, AuthorizationFailedException, CategoryNotFoundException {
 
-        //needs to be changed to bearer authorization//..............
-        System.out.println("Entering");
         CustomerEntity loggedCustomer = customerService.getCustomer(authorization);
-        System.out.println("auth done");
+
         RestaurantEntity fetchedRestaurant = restaurantService.restaurantByUUID(restaurantUuid);
-        System.out.println("restaurant fetched");
+
         RestaurantDetailsResponse restaurantDetailsResponse = new RestaurantDetailsResponse();
-        System.out.println("response sewing in progress");
+
             restaurantDetailsResponse.setId(UUID.fromString(fetchedRestaurant.getUuid()));
             restaurantDetailsResponse.setRestaurantName(fetchedRestaurant.getRestaurantName());
             restaurantDetailsResponse.setPhotoURL(fetchedRestaurant.getPhotoUrl());
@@ -145,7 +143,7 @@ public class RestaurantController {
                     itemEntitycat.setItemName(itmety.getItemName());
                     itemEntitycat.setPrice(itmety.getPrice());
                     for(ItemList.ItemTypeEnum itmtype : ItemList.ItemTypeEnum.values()) {
-                        if (itmety.getItemType().toString().equals(itmtype.toString())) itemEntitycat.setItemType(itmtype);
+                        if (itmety.getType().toString().equals(itmtype.toString())) itemEntitycat.setItemType(itmtype);
                     }
 
                     itemLists.add(itemEntitycat);
@@ -162,8 +160,8 @@ public class RestaurantController {
     //update restaurant rating given by customer
     @CrossOrigin
     @RequestMapping(path = "/api/restaurant/{restaurant_id}", method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<RestaurantUpdatedResponse> updateRestaurantRating(@RequestBody(required = false) final String restaurantUuid
-            , @RequestHeader("authorization ") final String authorization, @RequestBody(required = false) final double customerRating) throws RestaurantNotFoundException, AuthorizationFailedException, InvalidRatingException {
+    public ResponseEntity<RestaurantUpdatedResponse> updateRestaurantRating(@PathVariable("restaurant_id") final String restaurantUuid
+            , @RequestHeader("authorization") final String authorization, @RequestParam("customer_rating") final double customerRating) throws RestaurantNotFoundException, AuthorizationFailedException, InvalidRatingException {
 
         CustomerEntity loggedCustomer = customerService.getCustomer(authorization);
         RestaurantEntity fetchedRestaurant = restaurantService.restaurantByUUID(restaurantUuid);
@@ -180,7 +178,7 @@ public class RestaurantController {
     //Fetch restaurant by category ID
     @CrossOrigin
     @RequestMapping(path = "/restaurant/category/{category_id}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<RestaurantListResponse> getRestaurantByCategoryId(@RequestBody(required = false) final String categoryId) throws CategoryNotFoundException {
+    public ResponseEntity<RestaurantListResponse> getRestaurantByCategoryId(@PathVariable("category_id") final String categoryId) throws CategoryNotFoundException {
 
         List<RestaurantEntity> restaurantEntities = restaurantService.restaurantByCategory(categoryId);
 
@@ -232,7 +230,7 @@ public class RestaurantController {
     //Fetch restaurant by name
     @CrossOrigin
     @RequestMapping(path = "/restaurant/name/{restaurant_name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<RestaurantListResponse> getRestaurantByName(@RequestBody(required = false) final String restaurantName) throws RestaurantNotFoundException {
+    public ResponseEntity<RestaurantListResponse> getRestaurantByName(@PathVariable("restaurant_name") final String restaurantName) throws RestaurantNotFoundException {
 
         List<RestaurantEntity> restaurantEntities = restaurantService.restaurantsByName(restaurantName);
 

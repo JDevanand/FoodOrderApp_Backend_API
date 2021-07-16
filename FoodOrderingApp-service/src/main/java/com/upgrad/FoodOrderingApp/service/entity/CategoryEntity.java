@@ -16,7 +16,7 @@ import java.util.Set;
 @Table(name="category")
 @NamedQueries(
         {
-                @NamedQuery(name = "byCategoryUuid", query = "select s from CategoryEntity s where s.uuid = :uuid"),
+                @NamedQuery(name = "byCategoryUuid", query = "select s from CategoryEntity s where s.uuid = :uuid") ,
                 @NamedQuery(name = "getAllCategories", query = "select s from CategoryEntity s")
         }
 )
@@ -34,6 +34,19 @@ public class CategoryEntity {
     @Column(name ="category_name")
     @Size(max=255)
     private String categoryName;
+
+
+
+    @OneToMany
+    private List<ItemEntity> items = new ArrayList<>();
+
+    public List<ItemEntity> getItems() {
+        return items;
+    }
+
+    public void setItems(List<ItemEntity> items) {
+        this.items = items;
+    }
 
     @OneToMany(mappedBy = "category", cascade = CascadeType.ALL)
     private Set<CategoryItemEntity> categoryItemEntities = new HashSet<>();

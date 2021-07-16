@@ -33,6 +33,15 @@ public class PaymentEntity {
     @Size(max=255)
     private String paymentName;
 
+    public PaymentEntity(){
+
+    }
+
+    public PaymentEntity(String paymentId, String spmePayment) {
+        this.uuid = paymentId;
+        this.paymentName = spmePayment;
+    }
+
     public Integer getId() {
         return id;
     }

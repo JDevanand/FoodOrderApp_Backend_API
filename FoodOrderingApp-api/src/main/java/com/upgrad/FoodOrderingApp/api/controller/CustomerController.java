@@ -15,7 +15,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.ArrayList;
 import java.util.Base64;
+import java.util.List;
 import java.util.UUID;
 
 @RestController
@@ -51,7 +53,7 @@ public class CustomerController {
         signupUserResponse.setId(createdUserEntity.getUuid());
         signupUserResponse.setStatus("CUSTOMER SUCCESSFULLY REGISTERED");
 
-        return new ResponseEntity<SignupCustomerResponse>(signupUserResponse, HttpStatus.CREATED);
+        return new ResponseEntity<>(signupUserResponse, HttpStatus.CREATED);
     }
 
     //Customer SIGN IN endpoint
@@ -85,6 +87,9 @@ public class CustomerController {
         //Access token to be sent in header which will be used in request from frontend
         HttpHeaders headers = new HttpHeaders();
         headers.add("access-token",userAuthEntity.getAccessToken());
+        List<String> header = new ArrayList<>();
+        header.add("access-token");
+        headers.setAccessControlExposeHeaders(header);
 
         return new ResponseEntity<>(signInResponse,headers,HttpStatus.OK);
     }
@@ -94,9 +99,8 @@ public class CustomerController {
     @RequestMapping(path = "/customer/logout", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<LogoutResponse> logout(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
 
-        String accessToken = new String();
         String[] splitString = authorization.split(" ");
-        accessToken = splitString[1];
+        String accessToken = splitString[1];
 
         CustomerAuthEntity loggedUsersAuthToken = customerService.logout(accessToken);
 
@@ -112,15 +116,19 @@ public class CustomerController {
     @RequestMapping(path="/customer",method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<UpdateCustomerResponse> updateCustomer(@RequestHeader("authorization") final String authorization, @RequestBody(required = false) UpdateCustomerRequest updateCustomerRequest) throws AuthorizationFailedException, UpdateCustomerException {
 
-        if(updateCustomerRequest==null){
+
+        if(updateCustomerRequest==null || updateCustomerRequest.getFirstName().isEmpty()){
             throw new UpdateCustomerException("UCR-002","First name field should not be empty");
         }
 
-       CustomerEntity tobeUpdatedCustomer = customerService.getCustomer(authorization);
-        tobeUpdatedCustomer.setFirstName(updateCustomerRequest.getFirstName());
-        tobeUpdatedCustomer.setLastName(updateCustomerRequest.getLastName());
+        String[] splitStrings = authorization.split(" ");
+        String accessToken = splitStrings[1];
+        CustomerEntity loggedCustomer = customerService.getCustomer(accessToken);
 
-        CustomerEntity updatedCustomer = customerService.updateCustomer(tobeUpdatedCustomer);
+        loggedCustomer.setFirstName(updateCustomerRequest.getFirstName());
+        loggedCustomer.setLastName(updateCustomerRequest.getLastName());
+
+        CustomerEntity updatedCustomer = customerService.updateCustomer(loggedCustomer);
 
         UpdateCustomerResponse updatedCustomerResponse = new UpdateCustomerResponse();
         updatedCustomerResponse.setId(updatedCustomer.getUuid());
@@ -134,10 +142,17 @@ public class CustomerController {
     //Update customer password
     @CrossOrigin
     @RequestMapping(path="/customer/password",method = RequestMethod.PUT, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<UpdatePasswordResponse > updateCustomerPassword(@RequestHeader("authorization") final String authorization, final UpdatePasswordRequest updatePasswordRequest) throws AuthorizationFailedException, UpdateCustomerException {
+    public ResponseEntity<UpdatePasswordResponse > updateCustomerPassword(@RequestHeader("authorization") final String authorization, @RequestBody(required = false) final UpdatePasswordRequest updatePasswordRequest) throws AuthorizationFailedException, UpdateCustomerException {
 
-        CustomerEntity customerToBeUpdated = customerService.getCustomer(authorization);
-        CustomerEntity updatedCustomerEntity = customerService.updateCustomerPassword(updatePasswordRequest.getOldPassword(),updatePasswordRequest.getNewPassword(),customerToBeUpdated);
+        if(updatePasswordRequest.getOldPassword().isEmpty()|| updatePasswordRequest.getNewPassword().isEmpty()) {
+            throw new UpdateCustomerException("UCR-003","No field should be empty");
+        }
+
+        String[] splitStrings = authorization.split(" ");
+        String accessToken = splitStrings[1];
+        CustomerEntity loggedCustomer = customerService.getCustomer(accessToken);
+
+        CustomerEntity updatedCustomerEntity = customerService.updateCustomerPassword(updatePasswordRequest.getOldPassword(),updatePasswordRequest.getNewPassword(),loggedCustomer);
 
         UpdatePasswordResponse updatePasswordResponse = new UpdatePasswordResponse();
         updatePasswordResponse.setId(updatedCustomerEntity.getUuid());

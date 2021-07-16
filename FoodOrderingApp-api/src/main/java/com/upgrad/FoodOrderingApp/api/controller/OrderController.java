@@ -40,12 +40,13 @@ public class OrderController {
     //Get Coupon Details
     @CrossOrigin
     @RequestMapping(path = "/order/coupon/{coupon_name}", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<CouponDetailsResponse> getCouponByCouponName(@RequestHeader("authorization") final String authorization, @RequestParam("coupon_name") final String couponName) throws AuthorizationFailedException, CouponNotFoundException {
+    public ResponseEntity<CouponDetailsResponse> getCouponByCouponName(@RequestHeader("authorization") final String authorization, @PathVariable("coupon_name") final String couponName) throws AuthorizationFailedException, CouponNotFoundException {
 
-        String[] splitString = authorization.split(" ");
-        String accessToken = splitString[1];
+        String[] splitStrings = authorization.split(" ");
+        String accessToken = splitStrings[1];
 
-        CouponEntity fetchedCoupon = orderService.getCouponByCouponName(accessToken, couponName);
+        CustomerEntity loggedCustomer = customerService.getCustomer(accessToken);
+        CouponEntity fetchedCoupon = orderService.getCouponByCouponName(couponName);
         CouponDetailsResponse couponDetailsResponse = new CouponDetailsResponse();
 
         couponDetailsResponse.setId(UUID.fromString(fetchedCoupon.getUuid()));
@@ -58,11 +59,14 @@ public class OrderController {
     //Save new order
     @CrossOrigin
     @RequestMapping(path = "/order", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
-    public ResponseEntity<SaveOrderResponse> saveNewOrder(@RequestHeader("authorization") final String authorization, @RequestBody final SaveOrderRequest saveOrderRequest) throws AuthorizationFailedException, CouponNotFoundException, RestaurantNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException, ItemNotFoundException {
+    public ResponseEntity<SaveOrderResponse> saveNewOrder(@RequestHeader("authorization") final String authorization, @RequestBody(required = false) final SaveOrderRequest saveOrderRequest) throws AuthorizationFailedException, CouponNotFoundException, RestaurantNotFoundException, AddressNotFoundException, PaymentMethodNotFoundException, ItemNotFoundException {
 
-        //Authorization to be implemented
 
-        CustomerEntity loggedCustomer = customerService.getCustomer(authorization);
+        String[] splitStrings = authorization.split(" ");
+        String accessToken = splitStrings[1];
+
+        CustomerEntity loggedCustomer = customerService.getCustomer(accessToken);
+        CouponEntity coupon = orderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString());
         PaymentEntity payment = paymentService.getPaymentByUUID(saveOrderRequest.getPaymentId().toString());
         AddressEntity address = addressService.getAddressByUUID(saveOrderRequest.getAddressId(),loggedCustomer);
         RestaurantEntity restaurant = restaurantService.restaurantByUUID(saveOrderRequest.getRestaurantId().toString());
@@ -75,7 +79,6 @@ public class OrderController {
             newOrder.setDiscount(saveOrderRequest.getDiscount());
         }
 
-        CouponEntity coupon = orderService.getCouponByCouponId(saveOrderRequest.getCouponId().toString());
         newOrder.setCoupon(coupon);
 
         newOrder.setCustomer(loggedCustomer);
@@ -111,9 +114,11 @@ public class OrderController {
     @RequestMapping(path = "/order/customer", method = RequestMethod.GET, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<CustomerOrderResponse> getOrdersByCustomers(@RequestHeader("authorization") final String authorization) throws AuthorizationFailedException {
 
-        //<<Authorization pending>>//
-        CustomerEntity loggedCustomer = customerService.getCustomer(authorization);
 
+        String[] splitStrings = authorization.split(" ");
+        String accessToken = splitStrings[1];
+
+        CustomerEntity loggedCustomer = customerService.getCustomer(accessToken);
         List<OrderEntity> customerOrders = orderService.getOrdersByCustomers(loggedCustomer.getUuid());
 
         List<OrderList> customerOrderList = new ArrayList<>();

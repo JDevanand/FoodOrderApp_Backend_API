@@ -101,11 +101,7 @@ public class CustomerService {
     }
 
     //Get customer entity based on signed-in user
-    /******/
-    public CustomerEntity getCustomer(final String authorization) throws AuthorizationFailedException {
-
-        String[] splitString = authorization.split(" ");
-        String accessToken = splitString[1];
+    public CustomerEntity getCustomer(final String accessToken) throws AuthorizationFailedException {
 
         CustomerAuthEntity loggedUserAuthTokenEntity = bearerAuthentication(accessToken);
         return loggedUserAuthTokenEntity.getCustomer();
@@ -124,10 +120,6 @@ public class CustomerService {
 
     //Customer password update
     public CustomerEntity updateCustomerPassword(final String oldPassword,final String newPassword, final CustomerEntity customerEntity) throws AuthorizationFailedException, UpdateCustomerException {
-
-        if(oldPassword == null || newPassword ==null) {
-            throw new UpdateCustomerException("UCR-003","No field should be empty");
-        }
 
             //Check password strength
             if(!passwordChecker(newPassword)){
@@ -151,7 +143,7 @@ public class CustomerService {
     public CustomerAuthEntity bearerAuthentication(final String accessToken) throws AuthorizationFailedException {
 
         CustomerAuthEntity loggedUserAuthTokenEntity = customerAuthDao.getUserAuthToken(accessToken);
-        if(loggedUserAuthTokenEntity ==null){
+        if(loggedUserAuthTokenEntity==null){
             throw new AuthorizationFailedException("ATHR-001","Customer is not Logged in.");
         }
 
@@ -168,12 +160,11 @@ public class CustomerService {
 
     //Password Strength checker
     public static boolean passwordChecker(String input)    {
-        // Checking lower alphabet in string
+
         int n = input.length();
         boolean hasUpper = false,
                 hasDigit = false, specialChar = false;
 
-        // & * ^
         Set<Character> set = new HashSet<Character>(
                 Arrays.asList('!', '@', '#', '$', '%', '^', '&',
                         '*'));
@@ -187,7 +178,6 @@ public class CustomerService {
                 specialChar = true;
         }
 
-        // Strength of password
         if (hasDigit && hasUpper && specialChar && (n >= 8))
             return true;
         else
@@ -220,6 +210,5 @@ public class CustomerService {
         Pattern pat = Pattern.compile(emailRegex);
         return pat.matcher(email).matches();
     }
-
 
 }

@@ -34,6 +34,16 @@ public class CouponEntity {
     @Column(name ="percent")
     private Integer percent;
 
+    public CouponEntity(String couponId, String myCoupon, int percent) {
+        this.uuid = couponId;
+        this.couponName = myCoupon;
+        this.percent = percent;
+    }
+
+    public CouponEntity(){
+
+    }
+
     public Integer getId() {
         return id;
     }
