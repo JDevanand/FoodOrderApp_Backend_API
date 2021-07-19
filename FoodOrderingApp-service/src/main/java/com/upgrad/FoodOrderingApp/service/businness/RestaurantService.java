@@ -13,6 +13,8 @@ import com.upgrad.FoodOrderingApp.service.exception.RestaurantNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import org.apache.commons.math3.util.Precision;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
@@ -34,6 +36,7 @@ public class RestaurantService {
     public List<RestaurantEntity> restaurantsByRating(){
 
         List<RestaurantEntity> fetchedRestaurantList= restaurantDao.getAllRestaurants();
+
         Collections.sort(fetchedRestaurantList,RestaurantService.RatingComparator);
         return fetchedRestaurantList;
     }
@@ -41,7 +44,7 @@ public class RestaurantService {
     //Get restaurant details by UUID
     public RestaurantEntity restaurantByUUID(final String restaurantUuid) throws RestaurantNotFoundException {
 
-       if(restaurantUuid==null){
+       if(restaurantUuid.isEmpty()){
             throw new RestaurantNotFoundException("RNF-002","Restaurant id field should not be empty");
         }
 
@@ -49,7 +52,7 @@ public class RestaurantService {
         if(fetchedRestaurant==null){
             throw new RestaurantNotFoundException("RNF-001","No restaurant by this id");
         }
-        System.out.println("restaurant service fetched");
+
         return fetchedRestaurant;
     }
 
@@ -64,7 +67,7 @@ public class RestaurantService {
         int customerCount = restaurant.getNumberCustomersRated();
 
         double updatedRating = ((currentRating * customerCount) + customerRating)/(customerCount+1);
-        restaurant.setCustomerRating(updatedRating);
+        restaurant.setCustomerRating(Precision.round(updatedRating,2));
         restaurant.setNumberCustomersRated(customerCount +1);
 
         //merge this updated data in db
@@ -85,13 +88,15 @@ public class RestaurantService {
         }
 
         List<RestaurantCategoryEntity> restaurantCategoryEntities = restaurantCategoryDao.getRCByCategory(fetchedCategory);
+        if(restaurantCategoryEntities == null){
+            return null;
+        }
 
         List<RestaurantEntity> fetchedRestaurantList = new ArrayList<>();
         for(RestaurantCategoryEntity rce : restaurantCategoryEntities){
             RestaurantEntity re = rce.getRestaurantEntity();
             fetchedRestaurantList.add(re);
         }
-
         //Sort restaurant by name
         Collections.sort(fetchedRestaurantList,RestaurantService.NameComparator);
         return fetchedRestaurantList;
@@ -105,6 +110,10 @@ public class RestaurantService {
         }
         String pattern = "%"+searchName.toUpperCase()+"%";
         List<RestaurantEntity> fetchedRestaurantList = restaurantDao.getRestaurantByName(pattern);
+
+        if(fetchedRestaurantList==null){
+            return null;
+        }
 
         //Sort restaurant by name
         Collections.sort(fetchedRestaurantList,RestaurantService.NameComparator);

@@ -3,15 +3,18 @@ package com.upgrad.FoodOrderingApp.service.entity;
 import javax.persistence.*;
 import javax.validation.constraints.NotNull;
 import javax.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 @Entity
-@Table(name = "order")
+@Table(name = "orders")
 @NamedQueries(
         {
-                @NamedQuery(name="getOrderByCustomerId", query = "select o from OrderEntity o where o.customer=:customer")
+                @NamedQuery(name="getOrderByCustomerId", query = "select o from OrderEntity o where o.customer=:customer"),
+
+                @NamedQuery(name="getOrderByRestaurantId", query = "select o from OrderEntity o where o.restaurant=:restaurant")
         }
 )
 public class OrderEntity {
@@ -28,14 +31,14 @@ public class OrderEntity {
 
     @Column(name="BILL")
     @NotNull
-    private Number bill;
+    private BigDecimal bill;
 
     @ManyToOne
     @JoinColumn(name = "coupon_id")
     private CouponEntity coupon;
 
     @Column(name="DISCOUNT")
-    private Number discount;
+    private BigDecimal discount;
 
     @Column(name = "date")
     @NotNull
@@ -102,11 +105,11 @@ public class OrderEntity {
         this.uuid = uuid;
     }
 
-    public Number getBill() {
+    public BigDecimal getBill() {
         return bill;
     }
 
-    public void setBill(Number bill) {
+    public void setBill(BigDecimal bill) {
         this.bill = bill;
     }
 
@@ -118,11 +121,11 @@ public class OrderEntity {
         this.coupon = coupon;
     }
 
-    public Number getDiscount() {
+    public BigDecimal getDiscount() {
         return discount;
     }
 
-    public void setDiscount(Number discount) {
+    public void setDiscount(BigDecimal discount) {
         this.discount = discount;
     }
 

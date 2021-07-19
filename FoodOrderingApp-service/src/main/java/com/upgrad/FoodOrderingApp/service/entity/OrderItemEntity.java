@@ -7,7 +7,8 @@ import javax.persistence.*;
 
 @NamedQueries(
         {
-                @NamedQuery(name="getAllbyOrderId", query = "select p from OrderItemEntity p where p.order =:order")
+                //@NamedQuery(name="getOrderItemByOrderId", query = "select com.upgrad.FoodOrderingApp.service.entity.CustomItemCount(p.item,SUM(p.quantity)) from OrderItemEntity p where p.order =:order group by p.item order by p.quantity DESC")
+                @NamedQuery(name="getorderitembyOrder", query="select oie.item from OrderItemEntity oie where oie.order IN :orderentitylist group by oie.item.id order by sum(oie.quantity) desc")
         }
 )
 public class OrderItemEntity {
@@ -70,4 +71,5 @@ public class OrderItemEntity {
     public void setItem(ItemEntity item) {
         this.item = item;
     }
+
 }

@@ -16,7 +16,7 @@ public class RestaurantCategoryDao {
     @PersistenceContext
     private EntityManager entityManager;
 
-    public List<RestaurantCategoryEntity> getRestaurantandCategory(RestaurantEntity restaurantEntity){
+    public List<RestaurantCategoryEntity> getRestaurantandCategory(final RestaurantEntity restaurantEntity){
         try {
             return entityManager.createNamedQuery("byRestaurant", RestaurantCategoryEntity.class).setParameter("restaurantEntity", restaurantEntity)
                     .getResultList();

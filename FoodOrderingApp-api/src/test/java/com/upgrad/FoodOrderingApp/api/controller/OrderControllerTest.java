@@ -1,4 +1,3 @@
-/**
 package com.upgrad.FoodOrderingApp.api.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -609,7 +608,4 @@ public class OrderControllerTest {
         return new OrderEntity(orderId, 200.50, couponEntity, 10.0,
                 orderDate, paymentEntity, customerEntity, addressEntity, restaurantEntity);
     }
-
-
 }
-*/

@@ -30,6 +30,13 @@ public class CategoryController {
 
         List<CategoryEntity> categoryEntities = categoryService.getAllCategoriesOrderedByName();
         List<CategoryListResponse> categoryListResponses = new ArrayList<>();
+        CategoriesListResponse categoriesListResponse = new CategoriesListResponse();
+
+        if(categoryEntities == null){
+            categoriesListResponse.setCategories(null);
+            return new ResponseEntity<>(categoriesListResponse, HttpStatus.OK);
+        }
+
 
         for(CategoryEntity category: categoryEntities){
             CategoryListResponse clr = new CategoryListResponse();
@@ -38,7 +45,7 @@ public class CategoryController {
             categoryListResponses.add(clr);
         }
 
-        CategoriesListResponse categoriesListResponse = new CategoriesListResponse();
+
         return new ResponseEntity<>(categoriesListResponse.categories(categoryListResponses), HttpStatus.OK);
     }
 
@@ -52,6 +59,11 @@ public class CategoryController {
         categoriesDetailsResponse.setCategoryName(fetchedCategory.getCategoryName());
 
         List<ItemEntity> itemsTaggedToCategory = categoryService.getItemsbyCategoryId(fetchedCategory);
+        if(itemsTaggedToCategory == null){
+            categoriesDetailsResponse.setItemList(null);
+            return new ResponseEntity<>(categoriesDetailsResponse, HttpStatus.OK);
+        }
+
         List<ItemList> itemLists = new ArrayList<>();
         for(ItemEntity items: itemsTaggedToCategory){
             ItemList itm = new ItemList();

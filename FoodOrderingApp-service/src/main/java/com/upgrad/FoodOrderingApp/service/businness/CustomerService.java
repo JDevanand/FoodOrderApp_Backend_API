@@ -36,7 +36,7 @@ public class CustomerService {
     public CustomerEntity saveCustomer(CustomerEntity userEntity) throws SignUpRestrictedException {
 
 
-        if(userEntity.getFirstName().isEmpty() || userEntity.getContactNumber().isEmpty() ||userEntity.getPassword().isEmpty() || userEntity.getEmail().isEmpty()){
+        if(userEntity==null || userEntity.getFirstName().isEmpty() || userEntity.getContactNumber().isEmpty() ||userEntity.getPassword().isEmpty() || userEntity.getEmail().isEmpty()){
             throw new SignUpRestrictedException("SGR-005","Except lastname all fields should be filled");
         }
 

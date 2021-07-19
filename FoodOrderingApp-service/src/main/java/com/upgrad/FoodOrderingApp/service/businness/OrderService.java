@@ -14,9 +14,6 @@ import java.util.*;
 public class OrderService {
 
     @Autowired
-    private CustomerAuthDao customerAuthDao;
-
-    @Autowired
     private CouponDao couponDao;
 
     @Autowired
@@ -31,7 +28,7 @@ public class OrderService {
     //Get coupon details by Coupon name
     public CouponEntity getCouponByCouponName (String couponName) throws AuthorizationFailedException, CouponNotFoundException {
 
-            if(couponName == null){
+            if(couponName.isEmpty()){
                 throw new CouponNotFoundException("CPF-002","Coupon name field should not be empty");
             }
 
@@ -71,17 +68,14 @@ public class OrderService {
         CustomerEntity fetchedCustomer = customerDao. getUserByUuid(customerUuid);
 
         List<OrderEntity> customerOrders = orderDao.getCustomerOrders(fetchedCustomer);
-        /*
-        if(customerOrders == null){
+        if(customerOrders==null){
             return null;
         }
-        */
-
         Collections.sort(customerOrders,OrderService.DateComparator);
         return customerOrders;
     }
 
-    //Comparator to sort category
+    //Comparator to sort by date
     public static Comparator<OrderEntity> DateComparator = (s1, s2) -> {
         Date date1
                 = s1.getDate();

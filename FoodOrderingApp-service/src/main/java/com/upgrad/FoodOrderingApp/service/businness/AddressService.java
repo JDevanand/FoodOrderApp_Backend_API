@@ -133,10 +133,14 @@ public class AddressService {
     //Get all states (authentication not required)
     public List<StateEntity> getAllStates (){
 
-        return stateDao.getAllStates();
+        List<StateEntity>  stateEntities = stateDao.getAllStates();
+        if(stateEntities == null){
+            return null;
+        }
+        return stateEntities;
     }
 
-    //contact number format checker
+    //pincode number format checker
     public static boolean pincodeFormatChecker(String pincode){
 
         try {
@@ -151,7 +155,7 @@ public class AddressService {
         return true;
     }
 
-    //Comparator to sort category
+    //Comparator to sort by Address recent first
     public static Comparator<AddressEntity> AddressIdComparator = (s1, s2) -> {
         Integer address1 = s1.getId();
         Integer address2 = s2.getId();

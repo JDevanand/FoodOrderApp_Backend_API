@@ -33,7 +33,8 @@ public class CustomerController {
     @RequestMapping(path = "/customer/signup", method = RequestMethod.POST, produces = MediaType.APPLICATION_JSON_UTF8_VALUE)
     public ResponseEntity<SignupCustomerResponse> signup(@RequestBody(required = false) final SignupCustomerRequest signupCustomerRequest) throws SignUpRestrictedException {
 
-        if(signupCustomerRequest==null){
+        if(signupCustomerRequest==null || signupCustomerRequest.getFirstName().isEmpty()||signupCustomerRequest.getContactNumber().isEmpty()
+        || signupCustomerRequest.getPassword().isEmpty()||signupCustomerRequest.getEmailAddress().isEmpty()){
             throw new SignUpRestrictedException("SGR-005","Except lastname all fields should be filled");
         }
 

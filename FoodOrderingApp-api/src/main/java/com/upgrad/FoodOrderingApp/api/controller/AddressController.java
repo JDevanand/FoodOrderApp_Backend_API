@@ -69,6 +69,13 @@ public class AddressController {
 
         CustomerEntity loggedCustomer = customerService.getCustomer(accessToken);
         List<AddressEntity> addressEntityList = addressService.getAllAddress(loggedCustomer);
+
+        AddressListResponse addressListResponse = new AddressListResponse();
+        if(addressEntityList==null){
+            addressListResponse = null;
+            return new ResponseEntity<>(addressListResponse, HttpStatus.OK);
+        }
+
         List<AddressList> addressLists = new ArrayList<>();
 
         for (AddressEntity addressEntity : addressEntityList) {
@@ -87,7 +94,6 @@ public class AddressController {
             addressLists.add(adr);
         }
 
-        AddressListResponse addressListResponse = new AddressListResponse();
         return new ResponseEntity<>(addressListResponse.addresses(addressLists), HttpStatus.OK);
 
     }
@@ -117,6 +123,12 @@ public class AddressController {
     public ResponseEntity<StatesListResponse> getAllStates(){
 
         List<StateEntity> stateEntityList = addressService.getAllStates();
+        StatesListResponse statesListResponse = new StatesListResponse();
+
+        if(stateEntityList==null){
+            statesListResponse.setStates(null);
+            return new ResponseEntity<>(statesListResponse, HttpStatus.OK);
+        }
 
         List<StatesList> statesLists = new ArrayList<>();
 
@@ -131,7 +143,7 @@ public class AddressController {
             }
         }
 
-        StatesListResponse statesListResponse = new StatesListResponse();
+
         return new ResponseEntity<>(statesListResponse.states(statesLists), HttpStatus.OK);
     }
 

@@ -33,10 +33,9 @@ public class ItemController {
     public ResponseEntity<ItemListResponse> getCategoryByUuid(@PathVariable("restaurant_id")final String restaurantUuid) throws RestaurantNotFoundException {
 
         RestaurantEntity fetchedRestaurant = restaurantService.restaurantByUUID(restaurantUuid);
-
         List<ItemEntity> topFiveItems = itemService.getItemsByPopularity(fetchedRestaurant);
 
-        List<ItemList> itemLists = new ArrayList<>();
+        List<ItemList> itemLists = new ArrayList<ItemList>();
         for(ItemEntity items: topFiveItems){
             ItemList itmlist = new ItemList();
             itmlist.setId(UUID.fromString(items.getUuid()));
@@ -48,7 +47,8 @@ public class ItemController {
             itemLists.add(itmlist);
         }
 
-        ItemListResponse itemListResponse = new ItemListResponse();
+        ItemListResponse itemListResponse = new ItemListResponse() ;
+        itemListResponse.addAll(itemLists);
 
         return new ResponseEntity<>(itemListResponse, HttpStatus.OK);
     }

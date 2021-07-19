@@ -1,6 +1,8 @@
 package com.upgrad.FoodOrderingApp.service.businness;
 
 import com.upgrad.FoodOrderingApp.service.dao.ItemDao;
+import com.upgrad.FoodOrderingApp.service.dao.OrderDao;
+import com.upgrad.FoodOrderingApp.service.dao.OrderItemDao;
 import com.upgrad.FoodOrderingApp.service.dao.RestaurantItemDao;
 import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
@@ -27,24 +29,11 @@ public class ItemService {
     @Autowired
     private ItemDao itemDao;
 
-    public List<ItemEntity> getItemsByPopularity(RestaurantEntity restaurantEntity){
-        List<RestaurantItemEntity> restaurantItemEntities = restaurantItemDao.getRestaurantItemsById(restaurantEntity.getUuid());
+    @Autowired
+    private OrderDao orderDao;
 
-        List<ItemEntity> itemEntityList = new ArrayList<>();
-
-        /*
-        //List of items
-        for(RestaurantItemEntity items : restaurantItemEntities){
-            if(catItem.getCategory().getId() == category.getId()){
-                itemEntityList.add(catItem.getItem());
-            }
-        }
-        */
-
-        //sort descending order of items//............
-        //send top 5 of sorted list//...........
-        return itemEntityList;
-    }
+    @Autowired
+    private OrderItemDao orderItemDao;
 
 
     //getItemsby Category and restaurant
@@ -54,7 +43,6 @@ public class ItemService {
         CategoryEntity currentCategory = categoryService.getCategoryById(categoryUuid);
 
         return itemDao.getItemsByCategoryAndRestaurant(currentRestaurant,currentCategory);
-        //return itemDa
 
     }
 
@@ -67,4 +55,15 @@ public class ItemService {
         return fetchedItem;
     }
 
+    public List<ItemEntity> getItemsByPopularity(RestaurantEntity restaurantEntity){
+
+        // List of orders by restaurant
+        List<OrderEntity> fetchedOrderEntity = orderDao.getRestaurantOrders(restaurantEntity);
+        // List of order-item entities from the orders
+        List fetchedItems = orderItemDao.getOrderItemByOrderId(fetchedOrderEntity);
+        //Get list of items from the orderitementity list & its quantity
+        List<ItemEntity> itemEntities = new ArrayList<>();
+
+        return itemEntities;
+    }
 }

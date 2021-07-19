@@ -7,6 +7,7 @@ import org.apache.commons.lang3.builder.ToStringStyle;
 
 import javax.persistence.*;
 import javax.validation.constraints.Size;
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -40,7 +41,8 @@ public class RestaurantEntity {
     @Size(max=255)
     private String photoUrl;
 
-    @Column(name ="customer_rating")
+
+    @Column(name ="customer_rating", scale=2)
     private double customerRating;
 
     @Column(name ="average_price_for_two")
@@ -160,6 +162,7 @@ public class RestaurantEntity {
         this.address = address;
     }
 
+    /*
     @Override
     public boolean equals(Object obj) {
         return new EqualsBuilder().append(this, obj).isEquals();
@@ -174,5 +177,6 @@ public class RestaurantEntity {
     public String toString() {
         return ToStringBuilder.reflectionToString(this, ToStringStyle.MULTI_LINE_STYLE);
     }
+*/
 
 }

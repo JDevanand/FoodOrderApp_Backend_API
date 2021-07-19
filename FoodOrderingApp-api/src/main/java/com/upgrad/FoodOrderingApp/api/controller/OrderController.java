@@ -10,6 +10,9 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.math.BigDecimal;
+import java.time.LocalDate;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -77,6 +80,8 @@ public class OrderController {
         newOrder.setDate(new Date());
         if (saveOrderRequest.getDiscount() != null) {
             newOrder.setDiscount(saveOrderRequest.getDiscount());
+        }else{
+            newOrder.setDiscount(BigDecimal.valueOf(0));
         }
 
         newOrder.setCoupon(coupon);
@@ -125,7 +130,8 @@ public class OrderController {
         for(OrderEntity eachOrderEntity: customerOrders){
             OrderList fetchedOrderList = new OrderList();
             fetchedOrderList.setId(UUID.fromString(eachOrderEntity.getUuid()));
-            //fetchedOrderList.setBill(eachOrderEntity.getBill()); // <<big  decimal to number pending>>
+            fetchedOrderList.setBill(eachOrderEntity.getBill());
+            fetchedOrderList.setDiscount(eachOrderEntity.getDiscount());
 
             OrderListCoupon customerOrderListCouopon = new OrderListCoupon();
             customerOrderListCouopon.setId(UUID.fromString(eachOrderEntity.getCoupon().getUuid()));
@@ -173,6 +179,10 @@ public class OrderController {
                 iqrt.setItemName(orderItemEntity.getItem().getItemName());
                 iqrt.setItemPrice(orderItemEntity.getItem().getPrice());
                 //iqrt.setType(orderItemEntity.getItem().getType()); // <<fetch enum or convert string to enum>>
+
+                for(ItemQuantityResponseItem.TypeEnum itmtype : ItemQuantityResponseItem.TypeEnum.values()) {
+                    if (orderItemEntity.getItem().getType().toString().equals(itmtype.toString())) iqrt.setType(itmtype);
+                }
                 iqr.setItem(iqrt);
 
                 iqr.setPrice(orderItemEntity.getPrice());

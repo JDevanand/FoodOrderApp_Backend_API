@@ -11,7 +11,9 @@ import java.util.Set;
 @Table(name="item")
 @NamedQueries(
         {
-                @NamedQuery(name="getItembyUuid", query = "select p from ItemEntity p where p.uuid =:uuid")
+                @NamedQuery(name="getItembyUuid", query = "select p from ItemEntity p where p.uuid =:uuid"),
+                @NamedQuery(name="getItembyOrderEntityList", query = "SELECT itm from ItemEntity itm where itm IN :oie")
+
         }
 )
 public class ItemEntity {

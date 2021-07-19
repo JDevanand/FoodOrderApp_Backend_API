@@ -18,7 +18,6 @@ public class RestaurantDao {
 
     //Fetch all restaurant
     public List<RestaurantEntity> getAllRestaurants(){
-        //establish many to many things
         return entityManager.createNamedQuery("getAllRestaurant",RestaurantEntity.class).getResultList();
     }
 

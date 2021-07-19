@@ -6,6 +6,7 @@ import com.upgrad.FoodOrderingApp.service.dao.RestaurantCategoryDao;
 import com.upgrad.FoodOrderingApp.service.dao.RestaurantDao;
 import com.upgrad.FoodOrderingApp.service.entity.*;
 import com.upgrad.FoodOrderingApp.service.exception.CategoryNotFoundException;
+import com.upgrad.FoodOrderingApp.service.exception.RestaurantNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -27,7 +28,7 @@ public class CategoryService {
     private RestaurantCategoryDao restaurantCategoryDao;
 
     @Autowired
-    private RestaurantDao restaurantDao;
+    private RestaurantService restaurantService;
 
     //Get list of all categories
     public List<CategoryEntity> getAllCategoriesOrderedByName (){
@@ -42,7 +43,7 @@ public class CategoryService {
 
     //Get category by its uuid
     public CategoryEntity getCategoryById(final String categoryUuid) throws CategoryNotFoundException {
-        if(categoryUuid == null){
+        if(categoryUuid.isEmpty()){
             throw new CategoryNotFoundException("CNF-001","Category id field should not be empty");
         }
 
@@ -55,6 +56,9 @@ public class CategoryService {
 
     public List<ItemEntity> getItemsbyCategoryId(final CategoryEntity category){
         List<CategoryItemEntity> categoryItemEntities = categoryItemDao.getCatItemById(category);
+        if(categoryItemEntities == null){
+            return null;
+        }
 
         List<ItemEntity> itemEntityList = new ArrayList<>();
 
@@ -67,18 +71,21 @@ public class CategoryService {
     }
 
     //to be  completed for restaurant service
-    public List<CategoryEntity> getCategoriesByRestaurant(final String restaurantUuid){
+    public List<CategoryEntity> getCategoriesByRestaurant(final String restaurantUuid) throws RestaurantNotFoundException {
 
-        RestaurantEntity fetchedRestaurant = restaurantDao.getRestaurantByUuid(restaurantUuid);
+        RestaurantEntity fetchedRestaurant = restaurantService.restaurantByUUID(restaurantUuid);
+        if(fetchedRestaurant==null){
+            return null;
+        }
         List<RestaurantCategoryEntity> fetchedRCEntity= restaurantCategoryDao.getRestaurantandCategory(fetchedRestaurant);
 
+        if(fetchedRCEntity==null){
+            return null;
+        }
         List<CategoryEntity> categoryEntityList = new ArrayList<>();
         for(RestaurantCategoryEntity rce : fetchedRCEntity){
-            CategoryEntity restaurantCategory = new CategoryEntity();
-            restaurantCategory.setCategoryName(rce.getCategoryEntity().getCategoryName());
-            categoryEntityList.add(restaurantCategory);
+            categoryEntityList.add(rce.getCategoryEntity());
         }
-
         Collections.sort(categoryEntityList,CategoryService.CatNameComparator);
         return  categoryEntityList;
     }
